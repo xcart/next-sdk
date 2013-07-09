@@ -35,6 +35,10 @@ do {
 		define('XCN_MACROS_ROOT', $dir);
 		break;
 
+    } elseif (file_exists($dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'top.inc.php')) {
+        define('XCN_MACROS_ROOT', $dir . DIRECTORY_SEPARATOR . 'src');
+        break;
+
 	} else {
 		$tmp = realpath($dir . DIRECTORY_SEPARATOR . '..');
 		$dir = $tmp == $dir ? null : $tmp;
@@ -217,6 +221,16 @@ function macro_convert_camel_to_human_readable($camel)
     $camel = preg_replace('/([a-z0-9])([A-Z])([a-z0-9])/Sse', '\'\1 \' . strtolower(\'\2\') . \'\3\'', $camel);
 
     return ucfirst($camel);
+}
+
+function macro_exec($cmd)
+{
+    $output = array();
+    $result = 0;
+
+    exec('/usr/bin/env ' . $cmd, $output, $result);
+
+    return array($result, $output);
 }
 
 // {{{ Arguments checkers
