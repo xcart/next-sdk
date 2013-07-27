@@ -40,6 +40,7 @@ $removable      = !is_null(macro_get_named_argument('removable'));
 $switchable     = !is_null(macro_get_named_argument('switchable'));
 $sortable       = !is_null(macro_get_named_argument('sortable'));
 $searchFields   = macro_get_named_argument('search');
+$headSearch     = !is_null(macro_get_named_argument('headSearch'));
 $pagination     = !is_null(macro_get_named_argument('pagination'));
 $sortFields     = macro_get_named_argument('sort');
 $createInline   = !is_null(macro_get_named_argument('createInline'));
@@ -76,6 +77,7 @@ $entityRepoClass = str_replace('\\Model\\', '\\Model\\Repo\\', $entityClass);
 preg_match('/\\\Model\\\(.+)$/Ss', $entityClass, $match);
 $entityRelativeClass = $match[1];
 $entityShortClass = macro_get_class_short_name($entityClass);
+$alias = strtolower(substr($entityShortClass, 0, 1));
 
 $moduleAuthor = null;
 $moduleName = null;
@@ -182,6 +184,10 @@ foreach ($sortFields as $field) {
 
 // {{{ Define all variables
 
+$unitedSearchFields = $searchFields;
+$headSearchFields = $headSearch ? array_intersect($fields, $searchFields) : array();
+$searchFields = $headSearch ? array_diff($searchFields, $headSearchFields) : $searchFields;
+
 $type2fields = array(
     'text'     => 'XLite\View\FormField\Textarea\Simple',
     'integer'  => 'XLite\View\FormField\Input\Text\Integer',
@@ -222,7 +228,6 @@ $string = macro_get_class_repo_header($targetControllerPath)
     . <<<CODE
 /**
  * $targetHumanReadableName controller
- *
  */
 class $targetShort extends \\XLite\\Controller\\Admin\\AAdmin
 {
@@ -343,7 +348,6 @@ $string = macro_get_class_repo_header($viewListPagePath)
     . <<<CODE
 /**
  * $targetHumanReadableName page view
- *
  *
  * @ListChild (list="admin.center", zone="admin")
  */
@@ -473,7 +477,6 @@ $string = macro_get_class_repo_header($formListSearchPath)
     . <<<CODE
 /**
  * $targetHumanReadableName list search form
- *
  */
 class $formListSearchClassShort extends \\XLite\\View\\Form\\AForm
 {
@@ -523,7 +526,7 @@ CODE;
 
 {**
  * $fieldHumanReadable condition
- *  
+ *
  * @author    Creative Development LLC <info@cdev.ru> 
  * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
@@ -618,7 +621,6 @@ $string = macro_get_class_repo_header($formListTablePath)
     . <<<CODE
 /**
  * $targetHumanReadableName list table form
- *
  */
 class $formListTableClassShort extends \\XLite\\View\\Form\\ItemsList\\AItemsList
 {
@@ -649,6 +651,56 @@ echo 'done' . PHP_EOL;
 
 // }}}
 
+// {{{ Head-search widgets
+
+$headSearchWidgets = array();
+if ($headSearch && $headSearchFields) {
+    foreach ($headSearchFields as $field) {
+        $headSearchWidget = macro_assemble_class_name(
+            'View\\FormField\\Search\\' . macro_get_class_short_name($entityClass) . '\\' . ucfirst(\Includes\Utils\Converter::convertToCamelCase($field)),
+            $moduleAuthor,
+            $moduleName
+        );
+        $headSearchWidgets[$field] = $headSearchWidget;
+        $headSearchWidgetShort = macro_get_class_short_name($headSearchWidget);
+        $path = macro_convert_class_name_to_path($headSearchWidget);
+
+        echo "\t" . 'search head widget ' . $path . ' ... ';
+
+        $fieldHumanReadable = macro_convert_camel_to_human_readable($field);
+
+        $string = macro_get_class_repo_header($path)
+    . <<<CODE
+/**
+ * $fieldHumanReadable search widget
+ */
+class $headSearchWidgetShort extends \\XLite\\View\\FormField\\Search\\ASearch
+{
+    /**
+     * Define fields
+     *
+     * @return array
+     */
+    protected function defineFields()
+    {
+        return array(
+            array(
+                static::FIELD_NAME  => '$field',
+                static::FIELD_CLASS => 'XLite\View\FormField\Input\Text',
+            ),
+        );
+    }
+}
+CODE;
+
+        macro_file_put_contents($path, $string);
+        echo 'done' . PHP_EOL;
+        
+    }
+}
+
+// }}}
+
 // {{{ Item list widget
 
 $itemsListPath = macro_convert_class_name_to_path($itemsListClass);
@@ -663,7 +715,6 @@ $string = macro_get_class_repo_header($itemsListPath)
     . <<<CODE
 /**
  * $targetHumanReadableName items list
- *
  */
 class $itemsListClassShort extends \\XLite\\View\\ItemsList\\Model\\Table
 {
@@ -671,7 +722,7 @@ class $itemsListClassShort extends \\XLite\\View\\ItemsList\\Model\\Table
 CODE;
 
 // Widget parameters
-if ($searchFields) {
+if ($unitedSearchFields) {
 
     $string .= <<<CODE
     /**
@@ -679,7 +730,7 @@ if ($searchFields) {
      */
 
 CODE;
-    foreach ($searchFields as $field) {
+    foreach ($unitedSearchFields as $field) {
         $const = strtoupper($field);
         $fieldHumanReadable = macro_convert_camel_to_human_readable($field);
 
@@ -696,6 +747,30 @@ CODE;
 
 CODE;
 
+}
+
+// Sort by modes
+if ($sortFields) {
+    $string .= <<<CODE
+
+    /**
+     * Sort modes
+     *
+     * @var   array
+     */
+    protected \$sortByModes = array(
+
+CODE;
+
+    foreach ($sortFields as $field) {
+        $string .= '        \'' . $alias . '.' . $field . '\' => \'' . macro_convert_camel_to_human_readable($field) . '\',' . PHP_EOL;
+    }
+
+    $string .= <<<CODE
+    );
+
+
+CODE;
 }
 
 // CSS
@@ -740,6 +815,7 @@ CODE;
     foreach ($itemsListParams as $const => $paramDeclaration) {
         $string .= <<<CODE
             static::$const => $paramDeclaration,
+
 CODE;
     }
 
@@ -769,16 +845,32 @@ foreach ($fields as $field) {
     $fieldHumanReadable = macro_convert_camel_to_human_readable($field);
     $string .= <<<CODE
             '$field' => array(
-                static::COLUMN_NAME         => \XLite\Core\Translation::lbl('$fieldHumanReadable'),
+                static::COLUMN_NAME          => \XLite\Core\Translation::lbl('$fieldHumanReadable'),
 
 CODE;
     if ($editableFields && in_array($field, $editableFields)) {
-        $class = isset($type2inlineFields[$field['type']]) ? $type2inlineFields[$field['type']] : 'XLite\View\FormField\Inline\Input\Text';
+        $metaField = $metaData->fieldMappings[$field];
+        $class = isset($type2inlineFields[$metaField['type']]) ? $type2inlineFields[$metaField['type']] : 'XLite\View\FormField\Inline\Input\Text';
         $string .= <<<CODE
-                static::COLUMN_CLASS        => '$class',
+                static::COLUMN_CLASS         => '$class',
 
 CODE;
     }
+
+    if ($sortFields && in_array($field, $sortFields)) {
+        $string .= <<<CODE
+                static::COLUMN_SORT          => '{$alias}.{$field}',
+
+CODE;
+    }
+
+    if ($headSearchFields && in_array($field, $headSearchFields)) {
+        $string .= <<<CODE
+                static::COLUMN_SEARCH_WIDGET => '{$headSearchWidgets[$field]}',
+
+CODE;
+    }
+
     $string .= <<<CODE
             ),
 
@@ -832,6 +924,26 @@ $string .= <<<CODE
 
 
 CODE;
+
+// getOrderBy
+if ($sortFields) {
+    $string .= <<<CODE
+    /**
+     * Return 'Order by' array.
+     * array(<Field to order>, <Sort direction>)
+     *
+     * @return array
+     * @see    ____func_see____
+     * @since  1.0.6
+     */
+    protected function getOrderBy()
+    {
+        return array(\$this->getSortBy(), \$this->getSortOrder());
+    }
+
+
+CODE;
+}
 
 // getCreateButtonLabel
 $entityHumanReadableLow = lcfirst($entityHumanReadable);
@@ -1001,7 +1113,7 @@ $string .= <<<CODE
 
 CODE;
 
-    foreach ($searchFields as $field) {
+    foreach ($unitedSearchFields as $field) {
         $const = strtoupper($field);
         $string .= <<<CODE
             \\$entityRepoClass::SEARCH_$const => static::PARAM_SEARCH_$const,
@@ -1016,7 +1128,7 @@ CODE;
 
 CODE;
 
-if ($searchFields) {
+if ($unitedSearchFields) {
     $string .= <<<CODE
     /**
      * Define so called "request" parameters
@@ -1028,7 +1140,7 @@ if ($searchFields) {
         parent::defineRequestParams();
 
 CODE;
-    foreach ($searchFields as $field) {
+    foreach ($unitedSearchFields as $field) {
         $const = strtoupper($field);
         $string .= <<<CODE
         \$this->requestParams[] = static::PARAM_SEARCH_$const;
@@ -1051,6 +1163,19 @@ $string .= <<<CODE
     protected function getSearchCondition()
     {
         \$result = parent::getSearchCondition();
+
+
+CODE;
+
+if ($sortFields) {
+    $tmp = '{\\' . $entityRepoClass . '::SEARCH_ORDERBY}';
+    $string .= <<<CODE
+        \$result->$tmp = \$this->getOrderBy();
+
+CODE;
+}
+
+$string .= <<<CODE
 
         foreach (static::getSearchParams() as \$modelParam => \$requestParam) {
             \$paramValue = \$this->getParam(\$requestParam);
@@ -1111,7 +1236,6 @@ if (isset($itemsListPanelClass)) {
     . <<<CODE
 /**
  * $targetHumanReadableName items list's sticky panel
- *
  */
 class $itemsListPanelClassShort extends \\XLite\\View\\StickyPanel\\ItemsListForm
 {
@@ -1146,7 +1270,6 @@ if (!\Includes\Utils\FileManager::isExists($entityRepoPath)) {
     . <<<CODE
 /**
  * $targetHumanReadableName repository
- *
  */
 class $entityRepoClassShort extends $entityRepoParentClass
 {
@@ -1172,13 +1295,11 @@ if (!preg_match('/function +search *\(/Ss', $string)) {
 
 CODE;
 
-	$alias = strtolower(substr($entityShortClass, 0, 1));
-
 	$consts = '';
 	$handlingSearchParams = '';
 	$prepareMethods = '';
 
-	foreach ($searchFields as $field) {
+	foreach ($unitedSearchFields as $field) {
 		$const = strtoupper($field);
 		$consts .= <<<CODE
     const SEARCH_$const = '$field';
@@ -1447,7 +1568,6 @@ $string = macro_get_class_repo_header($targetOneControllerPath)
     . <<<CODE
 /**
  * $targetOneHumanReadableName controller
- *
  */
 class $targetOneShort extends \\XLite\\Controller\\Admin\\AAdmin
 {
@@ -1518,7 +1638,6 @@ $string = macro_get_class_repo_header($viewOnePagePath)
     . <<<CODE
 /**
  * $targetOneHumanReadableName page view
- *
  *
  * @ListChild (list="admin.center", zone="admin")
  */
@@ -1592,7 +1711,6 @@ $string = macro_get_class_repo_header($oneViewModelPath)
     . <<<CODE
 /**
  * $targetOneHumanReadableName view model
- *
  */
 class $oneViewModelClassShort extends \\XLite\\View\\Model\\AModel
 {
@@ -1727,7 +1845,6 @@ $string = macro_get_class_repo_header($formOnePath)
     . <<<CODE
 /**
  * $targetHumanReadableName list search form
- *
  */
 class $formOneClassShort extends \\XLite\\View\\Form\\AForm
 {
@@ -1855,6 +1972,9 @@ Usage: $script --entity=XLite\Model\Entity --fields=fld1,fld2,...,fldn [--edit=f
 
     --search=fld1,fld2,...,fldn
         Search fields list. Default - without any search.
+
+    --headSearch
+        Use head search. Default - no.
 
     --pagintation
         Use pagination. Default - no.
