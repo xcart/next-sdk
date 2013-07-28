@@ -1988,10 +1988,8 @@ Usage: $script --entity=XLite\Model\Entity --fields=fld1,fld2,...,fldn [--edit=f
     --menu=section
         Create menu section item. Default - no
 
-Example: .dev/macro/$script --enatity=XLite\\Model\\Product
+Example: .dev/macro/$script --entity=XLite\\Module\\Developer\\Example\\Model\\Message --fields=subject --edit=subject --removable --search=subject --headSearch --pagintation --sort=subject --menu=catalog
 
-As a result of the operation will create a file src/classes/XLite/Module/Tester/Test/XLite.php,
-which will be decorated class \XLite.
 HELP;
 }
 
