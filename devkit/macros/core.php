@@ -114,7 +114,14 @@ function macro_get_plain_argument($number)
  */
 function macro_convert_path_to_class_name($path)
 {
-    return str_replace(DIRECTORY_SEPARATOR, '\\', substr($path, strlen(LC_DIR_CLASSES), -4));
+    if (!file_exists($path)) {
+        if (!file_exists(dirname($path))) {
+            \Includes\Utils\FileManager::mkdirRecursive(dirname($path));
+        }
+        file_put_contents($path, '');
+    }
+
+    return str_replace(DIRECTORY_SEPARATOR, '\\', substr(realpath($path), strlen(LC_DIR_CLASSES), -4));
 }
 
 /**
@@ -386,8 +393,7 @@ function macro_get_class_header($path)
         $name = $reflection->getShortName();
         $header = <<<HEAD
 /**
- * Abstract widget
- *
+ * Abstract class
  */
 HEAD;
     }
