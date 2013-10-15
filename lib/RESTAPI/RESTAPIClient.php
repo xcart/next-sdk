@@ -92,7 +92,7 @@ class RESTAPIClient extends \Guzzle\Http\Client
      * @return RequestInterface
      * @see    Guzzle\Http\ClientInterface::createRequest()
      */
-    public function head($uri = null, $headers = null)
+    public function head($uri = null, $headers = null, array $options = array())
     {
         throw new \Exception('HEAD request not supported');
     }
@@ -107,9 +107,9 @@ class RESTAPIClient extends \Guzzle\Http\Client
      * @return EntityEnclosingRequestInterface
      * @see    Guzzle\Http\ClientInterface::createRequest()
      */
-    public function delete($uri = null, $headers = null, $body = null)
+    public function delete($uri = null, $headers = null, $body = null, array $options = array())
     {
-        return parent::delete($this->assembleAPIURI($uri), $headers, $body);
+        return parent::delete($this->assembleAPIURI($uri), $headers, $body, $options);
     }
 
     /**
@@ -122,13 +122,13 @@ class RESTAPIClient extends \Guzzle\Http\Client
      * @return EntityEnclosingRequestInterface
      * @see    Guzzle\Http\ClientInterface::createRequest()
      */
-    public function put($uri = null, $headers = null, $body = null)
+    public function put($uri = null, $headers = null, $body = null, array $options = array())
     {
         if (is_array($body)) {
             $body = http_build_query(array('model' => $body));
         }
 
-        return parent::put($this->assembleAPIURI($uri), $headers, $body);
+        return parent::put($this->assembleAPIURI($uri), $headers, $body, $options);
     }
 
     /**
@@ -141,7 +141,7 @@ class RESTAPIClient extends \Guzzle\Http\Client
      * @return EntityEnclosingRequestInterface
      * @see    Guzzle\Http\ClientInterface::createRequest()
      */
-    public function patch($uri = null, $headers = null, $body = null)
+    public function patch($uri = null, $headers = null, $body = null, array $options = array())
     {
         throw new \Exception('PATCH request not supported');
     }
@@ -158,9 +158,9 @@ class RESTAPIClient extends \Guzzle\Http\Client
      * @return EntityEnclosingRequestInterface
      * @see    Guzzle\Http\ClientInterface::createRequest()
      */
-    public function post($uri = null, $headers = null, $postBody = null)
+    public function post($uri = null, $headers = null, $postBody = null, array $options = array())
     {
-        return parent::post($this->assembleAPIURI($uri), $headers, $postBody);
+        return parent::post($this->assembleAPIURI($uri), $headers, $postBody, $options);
     }
 
     /**
@@ -171,7 +171,7 @@ class RESTAPIClient extends \Guzzle\Http\Client
      * @return RequestInterface
      * @see    Guzzle\Http\ClientInterface::createRequest()
      */
-    public function options($uri = null)
+    public function options($uri = null, array $options = array())
     {
         throw new \Exception('OPTIONS request not supported');
     }
