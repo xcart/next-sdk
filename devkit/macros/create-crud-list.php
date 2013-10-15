@@ -117,8 +117,14 @@ foreach ($editableFields as $field) {
 // --target
 if (!$target) {
     $target = str_replace('\\', '_', $entityRelativeClass);
-    $targetOne = $target;
     $target .= 's' == substr($target, -1) ? 'es' : 's';
+}
+
+if (false !== strpos($target, ',')) {
+    list($target, $targetOne) = explode(',', $target, 2);
+
+} else {
+    $targetOne = substr($target, 0, -1);
 }
 
 $targetSkinDir = $target = strtolower(preg_replace('/([a-z0-9])([A-Z])([a-z0-9])/Ss', '$1_$2$3', $target));
@@ -142,7 +148,6 @@ if ($list) {
     macro_error('Controller class \'' . $targetShort . '\' already exists (' . implode('; ', $list) . ')');
 }
 
-$targetOne = isset($targetOne) ? $targetOne : substr($target, 0, -1);
 $targetOneSkinDir = $targetOne = strtolower(preg_replace('/([a-z0-9])([A-Z])([a-z0-9])/Ss', '$1_$2$3', $targetOne));
 $targetOneShort = ucfirst(\Includes\Utils\Converter::convertToCamelCase($targetOne));
 $targetOneClass = macro_assemble_class_name('Controller\Admin\\' . $targetOneShort, $moduleAuthor, $moduleName);
@@ -849,8 +854,10 @@ foreach ($fields as $field) {
 
 CODE;
     if ($editableFields && in_array($field, $editableFields)) {
-        $metaField = $metaData->fieldMappings[$field];
-        $class = isset($type2inlineFields[$metaField['type']]) ? $type2inlineFields[$metaField['type']] : 'XLite\View\FormField\Inline\Input\Text';
+        $metaField = isset($metaData->fieldMappings[$field]) ? $metaData->fieldMappings[$field] : array();
+        $class = isset($metaField['type']) && isset($type2inlineFields[$metaField['type']])
+            ? $type2inlineFields[$metaField['type']]
+            : 'XLite\View\FormField\Inline\Input\Text';
         $string .= <<<CODE
                 static::COLUMN_CLASS         => '$class',
 
