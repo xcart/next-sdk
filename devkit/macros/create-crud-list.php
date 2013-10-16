@@ -239,7 +239,7 @@ class $targetShort extends \\XLite\\Controller\\Admin\\AAdmin
 
 CODE;
 
-if ($editableFields) {
+if ($editableFields || $removable || $switchable || $sortable) {
     $string .= <<<CODE
 
     /**
