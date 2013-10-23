@@ -45,6 +45,7 @@ $pagination     = !is_null(macro_get_named_argument('pagination'));
 $sortFields     = macro_get_named_argument('sort');
 $createInline   = !is_null(macro_get_named_argument('createInline'));
 $menu           = macro_get_named_argument('menu');
+$module         = macro_get_named_argument('module');
 
 // {{{ Check arguments
 
@@ -81,7 +82,7 @@ $alias = strtolower(substr($entityShortClass, 0, 1));
 
 $moduleAuthor = null;
 $moduleName = null;
-if (preg_match('/XLite\\\Module\\\([a-z0-9]+)\\\([a-z0-9]+)\\\Model/iSs', $entityClass, $match)) {
+if (preg_match('/([a-z0-9]+)\\\([a-z0-9]+)/iSs', $module, $match) or preg_match('/XLite\\\Module\\\([a-z0-9]+)\\\([a-z0-9]+)\\\Model/iSs', $entityClass, $match)) {
     $moduleAuthor = $match[1];
     $moduleName = $match[2];
 }
@@ -1995,7 +1996,10 @@ Usage: $script --entity=XLite\Model\Entity --fields=fld1,fld2,...,fldn [--edit=f
     --menu=section
         Create menu section item. Default - no
 
-Example: .dev/macro/$script --entity=XLite\\Module\\Developer\\Example\\Model\\Message --fields=subject --edit=subject --removable --search=subject --headSearch --pagintation --sort=subject --menu=catalog
+    --module=target_module
+        Identifiers of the module and its author. Default - taken from the --entity parameter.
+
+Example: .dev/macro/$script --entity=XLite\\Module\\Developer\\Example\\Model\\Message --fields=subject --edit=subject --removable --search=subject --headSearch --pagintation --sort=subject --menu=catalog --module=Developer\\MyModule
 
 HELP;
 }
