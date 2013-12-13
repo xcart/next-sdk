@@ -78,25 +78,8 @@ function macro_sll_check()
     $labels = macro_sll_find_all();
     $db = macro_sll_get_db_labels();
 
-    $diff = array_diff(array_keys($labels), array_keys($db));
-    if ($diff) {
-        print 'Exists only in code (templates or classes):' . PHP_EOL;
-        foreach ($diff as $name) {
-            print "\t" . '\'' . $name . '\'; Usage:' . PHP_EOL
-                . "\t\t" . implode(PHP_EOL . "\t\t", $labels[$name]) . PHP_EOL;
-            
-        }
-        print PHP_EOL;
-    }
-
-    $diff = array_diff(array_keys($db), array_keys($labels));
-    if ($diff) {
-        print 'Exists only in DB:' . PHP_EOL;
-        foreach ($diff as $name) {
-            print "\t" . '\'' . $name . '\'; Has translation to languages: ' . implode(', ', array_keys($db[$name])) . PHP_EOL;
-        }
-        print PHP_EOL;
-    }
+    macro_sll_compare_by_code($labels, $db);
+    macro_sll_compare_by_db($labels, $db);
 }
 
 function macro_sll_check_db()
@@ -104,6 +87,25 @@ function macro_sll_check_db()
     $labels = macro_sll_find_all();
     $db = macro_sll_get_db_labels();
 
+    macro_sll_compare_by_code($labels, $db);
+}
+
+function macro_sll_check_code()
+{
+    $labels = macro_sll_find_all();
+    $db = macro_sll_get_db_labels();
+
+    macro_sll_compare_by_db($labels, $db);
+}
+
+// }}}
+
+// {{{ Routines
+
+function macro_sll_compare_by_code(array $labels, array $db)
+{
+    $codes = macro_sll_get_db_languages();
+
     $diff = array_diff(array_keys($labels), array_keys($db));
     if ($diff) {
         print 'Exists only in code (templates or classes):' . PHP_EOL;
@@ -114,13 +116,27 @@ function macro_sll_check_db()
         }
         print PHP_EOL;
     }
+
+    $diff = array();
+    foreach ($db as $label => $translations) {
+        $tmp = array_diff($codes, array_keys($translations));
+        if ($tmp) {
+            $diff[$label] = $tmp;
+        }
+    }
+
+    if ($diff) {
+        print 'Partyally translations:' . PHP_EOL;
+        foreach ($diff as $name => $list) {
+            print "\t" . '\'' . $name . '\'; Mission translations: ' . implode(', ', $list) . PHP_EOL;
+
+        }
+        print PHP_EOL;
+    }
 }
 
-function macro_sll_check_code()
+function macro_sll_compare_by_db(array $labels, array $db)
 {
-    $labels = macro_sll_find_all();
-    $db = macro_sll_get_db_labels();
-
     $diff = array_diff(array_keys($db), array_keys($labels));
     if ($diff) {
         print 'Exists only in DB:' . PHP_EOL;
@@ -130,10 +146,6 @@ function macro_sll_check_code()
         print PHP_EOL;
     }
 }
-
-// }}}
-
-// {{{ Routines
 
 function macro_sll_find_all()
 {
@@ -208,6 +220,20 @@ function macro_sll_get_db_labels()
     }
 
     return $labels;
+}
+
+function macro_sll_get_db_languages()
+{
+    $codes = array();
+
+    $list = \XLite\Core\Database::getRepo('XLite\Model\LanguageLabelTranslation')->createPureQueryBuilder()
+        ->groupBy('l.code')
+        ->getArrayResult();
+    foreach ($list as $cell) {
+        $codes[] = $cell['code'];
+    }
+
+    return $codes;
 }
 
 // }}}
