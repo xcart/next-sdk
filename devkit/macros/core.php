@@ -240,6 +240,18 @@ function macro_exec($cmd)
     return array($result, $output);
 }
 
+function macro_print_csv(array $data)
+{
+    $fp = fopen('php://output', 'w');
+    foreach ($data as $row) {
+        if (!is_array($row)) {
+            $row = array($row);
+        }
+        fputcsv($fp, $row);
+    }
+    fclose($fp);
+}
+
 // {{{ Arguments checkers
 
 /**

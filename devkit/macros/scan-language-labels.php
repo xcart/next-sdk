@@ -30,34 +30,42 @@
 
 require_once __DIR__ . '/core.php';
 
-define('RESULT_CHECK', 'check');
 define('RESULT_CHECK_DB', 'check-db');
 define('RESULT_CHECK_CODE', 'check-code');
+define('RESULT_CHECK_PARTIALLY', 'check-partially');
+
+define('OUTPUT_HUMAN_READABLE', 'hunam-readable');
+define('OUTPUT_YAML', 'yaml');
+define('OUTPUT_CSV', 'csv');
 
 // Get arguments
-$result   = macro_get_named_argument('result') ?: RESULT_CHECK;
+$result   = macro_get_named_argument('result') ?: RESULT_CHECK_DB;
 $language = macro_get_named_argument('language');
+$output   = macro_get_named_argument('output') ?: OUTPUT_HUMAN_READABLE;
 
 // {{{ Check arguments
 
 // --result
-if ($result && !in_array($result, array(RESULT_CHECK, RESULT_CHECK_DB, RESULT_CHECK_CODE))) {
+if (!in_array($result, array(RESULT_CHECK_DB, RESULT_CHECK_CODE, RESULT_CHECK_PARTIALLY))) {
     macro_error('--result has wrong value');
 }
 
 // --language
-if ($language && preg_match('/^[a-z]{2}$/Ss', $language)) {
+if ($language && !preg_match('/^[a-z]{2}$/Ss', $language)) {
     macro_error('--language has wrong value');
+
+} elseif ($language && !macro_sll_get_db_languages()) {
+    macro_error('--language has langauge code is not in the database');
+}
+
+// --output
+if (!in_array($output, array(OUTPUT_HUMAN_READABLE, OUTPUT_YAML, OUTPUT_CSV))) {
+    macro_error('--output has wrong value');
 }
 
 // }}}
 
-
 switch ($result) {
-    case RESULT_CHECK:
-        macro_sll_check();
-        break;
-
     case RESULT_CHECK_DB:
         macro_sll_check_db();
         break;
@@ -66,21 +74,16 @@ switch ($result) {
         macro_sll_check_code();
         break;
 
+    case RESULT_CHECK_PARTIALLY:
+        macro_sll_check_partially();
+        break;
+
     default:
 }
 
 die(0);
 
 // {{{ Result generators
-
-function macro_sll_check()
-{
-    $labels = macro_sll_find_all();
-    $db = macro_sll_get_db_labels();
-
-    macro_sll_compare_by_code($labels, $db);
-    macro_sll_compare_by_db($labels, $db);
-}
 
 function macro_sll_check_db()
 {
@@ -98,24 +101,104 @@ function macro_sll_check_code()
     macro_sll_compare_by_db($labels, $db);
 }
 
+function macro_sll_check_partially()
+{
+    $labels = macro_sll_find_all();
+    $db = macro_sll_get_db_labels();
+
+    macro_sll_compare_partially($labels, $db);
+}
+
 // }}}
 
-// {{{ Routines
+// {{{ Processors
 
 function macro_sll_compare_by_code(array $labels, array $db)
 {
-    $codes = macro_sll_get_db_languages();
-
     $diff = array_diff(array_keys($labels), array_keys($db));
     if ($diff) {
-        print 'Exists only in code (templates or classes):' . PHP_EOL;
-        foreach ($diff as $name) {
-            print "\t" . '\'' . $name . '\'; Usage:' . PHP_EOL
-                . "\t\t" . implode(PHP_EOL . "\t\t", $labels[$name]) . PHP_EOL;
+        if (OUTPUT_HUMAN_READABLE == $GLOBALS['output']) {
 
+            print 'Exists only in code (templates or classes):' . PHP_EOL;
+            foreach ($diff as $name) {
+                print "\t" . '\'' . $name . '\'; Usage:' . PHP_EOL
+                    . "\t\t" . implode(PHP_EOL . "\t\t", $labels[$name]) . PHP_EOL;
+
+            }
+            print PHP_EOL;
+
+        } elseif (OUTPUT_YAML == $GLOBALS['output']) {
+
+            $data = array(
+                '\\XLite\\Model\\LanguageLabel' => array(),
+            );
+            foreach ($diff as $name) {
+                $data['\\XLite\\Model\\LanguageLabel'][] = array(
+                    'name' => $name,
+                    'translations' => array(
+                        array(
+                            'code'  => 'en',
+                            'label' => $name,
+                        ),
+                    ),
+                );
+            }
+
+            print \Symfony\Component\Yaml\Yaml::dump($data) . PHP_EOL;
+
+        } elseif (OUTPUT_CSV == $GLOBALS['output']) {
+
+            $data = array();
+            foreach ($diff as $name) {
+                $data[] = array($name, $name);
+            }
+
+            macro_print_csv($data);
+            print PHP_EOL;
         }
-        print PHP_EOL;
     }
+}
+
+function macro_sll_compare_by_db(array $labels, array $db)
+{
+    $diff = array_diff(array_keys($db), array_keys($labels));
+    if ($diff) {
+        if (OUTPUT_HUMAN_READABLE == $GLOBALS['output']) {
+            print 'Exists only in DB:' . PHP_EOL;
+            foreach ($diff as $name) {
+                print "\t" . '\'' . $name . '\'; Has translation to languages: ' . implode(', ', array_keys($db[$name])) . PHP_EOL;
+            }
+            print PHP_EOL;
+
+        } elseif (OUTPUT_YAML == $GLOBALS['output']) {
+
+            $data = array(
+                '\\XLite\\Model\\LanguageLabel' => array(),
+            );
+            foreach ($diff as $name) {
+                $data['\\XLite\\Model\\LanguageLabel'][] = array(
+                    'name' => $name,
+                );
+            }
+
+            print \Symfony\Component\Yaml\Yaml::dump($data) . PHP_EOL;
+
+        } elseif (OUTPUT_CSV == $GLOBALS['output']) {
+
+            $data = array();
+            foreach ($diff as $name) {
+                $data[] = array($name);
+            }
+
+            macro_print_csv($data);
+            print PHP_EOL;
+        }
+    }
+}
+
+function macro_sll_compare_partially(array $labels, array $db)
+{
+    $codes = macro_sll_get_db_languages();
 
     $diff = array();
     foreach ($db as $label => $translations) {
@@ -126,26 +209,77 @@ function macro_sll_compare_by_code(array $labels, array $db)
     }
 
     if ($diff) {
-        print 'Partyally translations:' . PHP_EOL;
-        foreach ($diff as $name => $list) {
-            print "\t" . '\'' . $name . '\'; Mission translations: ' . implode(', ', $list) . PHP_EOL;
+        if (OUTPUT_HUMAN_READABLE == $GLOBALS['output']) {
+            print 'Partyally translations:' . PHP_EOL;
+            foreach ($diff as $name => $list) {
+                print "\t" . '\'' . $name . '\'; Mission translations: ' . implode(', ', $list) . PHP_EOL;
 
+            }
+            print PHP_EOL;
+
+        } elseif (OUTPUT_YAML == $GLOBALS['output']) {
+
+            $codes = array();
+            foreach ($diff as $name => $list) {
+                $codes += $list;
+            }
+
+            foreach ($codes as $code) {
+                if (1 < count($codes)) {
+                    print '# Language code: ' . $code . PHP_EOL;
+                }
+                $data = array(
+                    '\\XLite\\Model\\LanguageLabel' => array(),
+                );
+                foreach ($diff as $name => $list) {
+                    if (in_array($code, $list)) {
+                        $label = $name;
+                        if ($code != 'en' && !empty($db[$name]['en'])) {
+                            $label = $db[$name]['en'];
+                        }
+                        $data['\\XLite\\Model\\LanguageLabel'][] = array(
+                            'name' => $name,
+                            'translations' => array(
+                                array(
+                                    'code'  => $code,
+                                    'label' => $label,
+                                ),
+                            ),
+                        );
+                    }
+                }
+
+                print \Symfony\Component\Yaml\Yaml::dump($data) . PHP_EOL;
+            }
+
+        } elseif (OUTPUT_CSV == $GLOBALS['output']) {
+
+            $data = array();
+            $codes = array();
+            foreach ($diff as $name => $list) {
+                $codes += $list;
+            }
+
+            foreach ($codes as $code) {
+                if (1 < count($codes)) {
+                    $data[] = array('Language code: ' . $code);
+                }
+                foreach ($diff as $name => $list) {
+                    if (in_array($code, $list)) {
+                        $data[] = array($name, $name);
+                    }
+                }
+            }
+
+            macro_print_csv($data);
+            print PHP_EOL;
         }
-        print PHP_EOL;
     }
 }
 
-function macro_sll_compare_by_db(array $labels, array $db)
-{
-    $diff = array_diff(array_keys($db), array_keys($labels));
-    if ($diff) {
-        print 'Exists only in DB:' . PHP_EOL;
-        foreach ($diff as $name) {
-            print "\t" . '\'' . $name . '\'; Has translation to languages: ' . implode(', ', array_keys($db[$name])) . PHP_EOL;
-        }
-        print PHP_EOL;
-    }
-}
+// }}}
+
+// {{{ Routines
 
 function macro_sll_find_all()
 {
@@ -233,6 +367,10 @@ function macro_sll_get_db_languages()
         $codes[] = $cell['code'];
     }
 
+    if ($GLOBALS['language']) {
+        $codes = array_intersect($codes, array($GLOBALS['language']));
+    }
+
     return $codes;
 }
 
@@ -245,16 +383,20 @@ function macro_help()
     $script = __FILE__;
 
     return <<<HELP
-Usage: $script --result=<mode> [--language=<language_code>]
+Usage: $script [--result=<mode>] [--language=<language_code>] [--output=<output_mode>]
 
     --result=<mode>
         Result mode. Variants:
-            check      - check DB and code (default)
-            check-db   - check DB
+            check-db   - check DB (default)
             check-code - check only code
 
     --language=<language_code>
         Language code
+
+    --output=<output_mode>
+        Output mode. Variants:
+            human-readable - human redable (default)
+            yaml           - as YAML
 
 Example: .dev/macro/$script
 

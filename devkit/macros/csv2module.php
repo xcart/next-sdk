@@ -23,17 +23,23 @@
  * @link      http://www.litecommerce.com/
  */
 
-// Autloader
-spl_autoload_register(
-    function($class) {
-        $class = ltrim($class, '\\');
-        list($prefix) = explode('\\', $class, 2);
+if (file_exists(__DIR__ . '/core.php') && PHP_SAPI == 'cli') {
+    require_once __DIR__ . '/core.php';
 
-        if ('Symfony' == $prefix) {
-            require_once (__DIR__ . '/lib/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php');
+} else {
+
+    // Autloader
+    spl_autoload_register(
+        function($class) {
+            $class = ltrim($class, '\\');
+            list($prefix) = explode('\\', $class, 2);
+
+            if ('Symfony' == $prefix) {
+                require_once (__DIR__ . '/lib/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php');
+            }
         }
-    }
-);
+    );
+}
 
 // Console runner
 if (PHP_SAPI == 'cli') {
@@ -177,7 +183,7 @@ function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ','
     do {
 
         $row = fgetcsv($fp, 0, $delimiter);
-        if (is_array($row) && 2 == count($row)) {
+        if (is_array($row) && 2 <= count($row)) {
 
             $data[] = array(
                 'name' => $row[0],
