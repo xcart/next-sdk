@@ -42,6 +42,7 @@ define('OUTPUT_CSV', 'csv');
 $result   = macro_get_named_argument('result') ?: RESULT_CHECK_DB;
 $language = macro_get_named_argument('language');
 $output   = macro_get_named_argument('output') ?: OUTPUT_HUMAN_READABLE;
+$module   = macro_get_named_argument('module');
 
 // {{{ Check arguments
 
@@ -116,6 +117,36 @@ function macro_sll_check_partially()
 function macro_sll_compare_by_code(array $labels, array $db)
 {
     $diff = array_diff(array_keys($labels), array_keys($db));
+
+    if ($diff && $GLOBALS['module']) {
+        $module = str_replace('\\', DIRECTORY_SEPARATOR, $GLOBALS['module']);
+
+        foreach ($diff as $k => $name) {
+            $paths = $labels[$name];
+            foreach ($paths as $i => $path) {
+                if ('none' == $GLOBALS['module']) {
+                    if (preg_match('/skins.[a-z]+.en.modules|XLite.Module/Ss', $path)) {
+                        unset($paths[$i]);
+                    }
+
+               } elseif ('only' == $GLOBALS['module']) {
+                    if (!preg_match('/skins.[a-z]+.en.modules|XLite.Module/Ss', $path)) {
+                        unset($paths[$i]);
+                    }
+
+                } elseif (false === strpos($path, $module)) {
+                    unset($paths[$i]);
+                }
+            }
+
+            if (!$paths) {
+                unset($diff[$k]);
+            }
+        }
+
+        $diff = array_values($diff);
+    }
+
     if ($diff) {
         if (OUTPUT_HUMAN_READABLE == $GLOBALS['output']) {
 
@@ -130,10 +161,10 @@ function macro_sll_compare_by_code(array $labels, array $db)
         } elseif (OUTPUT_YAML == $GLOBALS['output']) {
 
             $data = array(
-                '\\XLite\\Model\\LanguageLabel' => array(),
+                'XLite\\Model\\LanguageLabel' => array(),
             );
             foreach ($diff as $name) {
-                $data['\\XLite\\Model\\LanguageLabel'][] = array(
+                $data['XLite\\Model\\LanguageLabel'][] = array(
                     'name' => $name,
                     'translations' => array(
                         array(
@@ -173,10 +204,10 @@ function macro_sll_compare_by_db(array $labels, array $db)
         } elseif (OUTPUT_YAML == $GLOBALS['output']) {
 
             $data = array(
-                '\\XLite\\Model\\LanguageLabel' => array(),
+                'XLite\\Model\\LanguageLabel' => array(),
             );
             foreach ($diff as $name) {
-                $data['\\XLite\\Model\\LanguageLabel'][] = array(
+                $data['XLite\\Model\\LanguageLabel'][] = array(
                     'name' => $name,
                 );
             }
@@ -229,7 +260,7 @@ function macro_sll_compare_partially(array $labels, array $db)
                     print '# Language code: ' . $code . PHP_EOL;
                 }
                 $data = array(
-                    '\\XLite\\Model\\LanguageLabel' => array(),
+                    'XLite\\Model\\LanguageLabel' => array(),
                 );
                 foreach ($diff as $name => $list) {
                     if (in_array($code, $list)) {
@@ -237,7 +268,7 @@ function macro_sll_compare_partially(array $labels, array $db)
                         if ($code != 'en' && !empty($db[$name]['en'])) {
                             $label = $db[$name]['en'];
                         }
-                        $data['\\XLite\\Model\\LanguageLabel'][] = array(
+                        $data['XLite\\Model\\LanguageLabel'][] = array(
                             'name' => $name,
                             'translations' => array(
                                 array(
@@ -266,7 +297,11 @@ function macro_sll_compare_partially(array $labels, array $db)
                 }
                 foreach ($diff as $name => $list) {
                     if (in_array($code, $list)) {
-                        $data[] = array($name, $name);
+                        $label = $name;
+                        if ($code != 'en' && !empty($db[$name]['en'])) {
+                            $label = $db[$name]['en'];
+                        }
+                        $data[] = array($name, $label);
                     }
                 }
             }
@@ -302,8 +337,8 @@ function macro_sll_find_all()
     // Scan classes
     macro_sll_find_all_by_iterator(
         $labels,
-        new \Includes\Utils\FileFilter(LC_DIR_CLASSES, '/\.js$/Ss', \RecursiveIteratorIterator::CHILD_FIRST),
-        '/(?:(?:static::|self::|\$this->)t|.XLite.Core.Translation::getInstance\(\)->translate|.XLite.Core.Translation::lbl)(\s*\'([^\']+)\'/Ss'
+        new \Includes\Utils\FileFilter(LC_DIR_CLASSES, '/\.php$/Ss', \RecursiveIteratorIterator::CHILD_FIRST),
+        '/(?:(?:static::|self::|\$this->)t|.XLite.Core.Translation::getInstance\(\)->translate|.XLite.Core.Translation::lbl|.XLite.Core.TopMessage::add(?:Info|Error|Warning))\(\s*\'(.+)\'(?:,|\s*\))/USs'
     );
 
     return $labels;
@@ -326,6 +361,11 @@ function macro_sll_find_all_by_iterator(array &$labels, \Includes\Utils\FileFilt
         foreach ($patterns as $pattern) {
             if (preg_match_all($pattern, $body, $matches)) {
                 foreach ($matches[1] as $label) {
+
+                    // Preprocess
+                    $label = preg_replace('/\'\s+\.\s+\'/Ss', '', $label);
+
+                    // Store
                     if (!isset($labels[$label])) {
                         $labels[$label] = array($path);
 
