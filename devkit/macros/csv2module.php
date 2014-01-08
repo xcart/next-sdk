@@ -62,11 +62,21 @@ if (PHP_SAPI == 'cli') {
         die(1);
     }
 
-    if (empty($author)) {
-        print '--module argument is empty!' . PHP_EOL
+    if (empty($code)) {
+        print '--code argument is empty!' . PHP_EOL
             . PHP_EOL
             . csv2m_help();
-        die(2);
+        die(4);
+
+    } elseif (!csv2m_validate_code($code)) {
+        print '--code argument has wrong format!' . PHP_EOL
+            . PHP_EOL
+            . csv2m_help();
+        die(4);
+    }
+
+    if (empty($module)) {
+        $module = ucfirst($code) . 'Translation';
 
     } elseif (!csv2m_validate_module($module)) {
         print '--module argument has wrong format!' . PHP_EOL
@@ -94,19 +104,6 @@ if (PHP_SAPI == 'cli') {
         die(3);
     }
 
-    if (empty($code)) {
-        print '--code argument is empty!' . PHP_EOL
-            . PHP_EOL
-            . csv2m_help();
-        die(4);
-
-    } elseif (!csv2m_validate_code($code)) {
-        print '--code argument has wrong format!' . PHP_EOL
-            . PHP_EOL
-            . csv2m_help();
-        die(4);
-    } 
-
     if (empty($delimiter)) {
         print '--delimiter argument is empty!' . PHP_EOL
             . PHP_EOL
@@ -114,7 +111,7 @@ if (PHP_SAPI == 'cli') {
         die(5);
     }
 
-    $destPath = __DIR__ . DIRECTORY_SEPARATOR . 'module.phar';
+    $destPath = getcwd() . DIRECTORY_SEPARATOR . 'module.phar';
 
     $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter);
     if ($errors) {
@@ -457,7 +454,7 @@ function delTree ($dir)
 function csv2m_help()
 {
     return <<<HELP
-Usage: php csv2module.php --path=<path> --author=<author> --module=<module> --code=<language_code> [--delimiter=<delimiter>]
+Usage: php csv2module.php --path=<path> --author=<author> --code=<language_code> [--module=<module>] [--delimiter=<delimiter>]
 
 Example: php csv2module.php --path=example.csv --author=JohnSmith --module=EsTranslation --code=es --delimiter=,
 
@@ -469,7 +466,7 @@ Options:
         Module author
 
     --module=<module>
-        Module name
+        Module name. Default - <code>Translation
 
     --code=<language_code>
         2-character language code
