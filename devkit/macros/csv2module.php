@@ -111,7 +111,7 @@ if (PHP_SAPI == 'cli') {
         die(5);
     }
 
-    $destPath = getcwd() . DIRECTORY_SEPARATOR . 'module.phar';
+    $destPath = getcwd() . DIRECTORY_SEPARATOR . 'module.tar';
 
     $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter);
     if ($errors) {
@@ -161,16 +161,18 @@ function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ','
         unlink($destPath . '.gz');
     }
 
-    if (file_exists($destPath . '.directory')) {
-        delTree($destPath . '.directory');
+    if (file_exists($dir)) {
+        delTree($dir);
     }
 
     mkdir($dir);
     mkdir($dir . '/classes');
-    mkdir($dir . '/classes/' . $author);
-    mkdir($dir . '/classes/' . $author . '/' . $module);
+    mkdir($dir . '/classes/XLite');
+    mkdir($dir . '/classes/XLite/Module');
+    mkdir($dir . '/classes/XLite/Module/' . $author);
+    mkdir($dir . '/classes/XLite/Module/' . $author . '/' . $module);
 
-    $dir2 = $dir . '/classes/' . $author . '/' . $module;
+    $dir2 = $dir . '/classes/XLite/Module/' . $author . '/' . $module;
 
     // Write install.yzml
 
@@ -380,12 +382,12 @@ PHP;
     // Pack to .phar
 
     try {
-        $phar = new \Phar($destPath);
+        $phar = new \PharData($destPath);
         $phar->buildFromDirectory($dir);
         $phar->setMetadata(
             array(
                 'RevisionDate' => time(),
-                'ActualName'   => $module,
+                'ActualName'   => $author . '\\' . $module,
                 'VersionMinor' => '0',
                 'VersionMajor' => '5.0',
                 'Name'         => $module,
@@ -449,6 +451,11 @@ function delTree ($dir)
     }
 
     return rmdir($dir); 
+}
+
+function macro_help()
+{
+    return csv2m_help();
 }
 
 function csv2m_help()
