@@ -3,9 +3,9 @@
 
 /**
  * LiteCommerce
- * 
+ *
  * NOTICE OF LICENSE
- * 
+ *
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
@@ -13,11 +13,11 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to licensing@litecommerce.com so we can send you a copy immediately.
- * 
+ *
  * PHP version 5.3.0
- * 
+ *
  * @category  LiteCommerce
- * @author    Creative Development LLC <info@cdev.ru> 
+ * @author    Creative Development LLC <info@cdev.ru>
  * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      http://www.litecommerce.com/
@@ -63,14 +63,14 @@ if (isset($options['h']) || isset($options['help'])) {
 }
 
 /**
- * Functions 
+ * Functions
  */
 
 /**
- * Display error 
- * 
+ * Display error
+ *
  * @param string $msg Error message
- *  
+ *
  * @return void
  */
 function macro_error($msg)
@@ -95,9 +95,9 @@ function macro_get_named_argument($name)
 
 /**
  * Get script argument by index
- * 
+ *
  * @param integer $number Index
- *  
+ *
  * @return string
  */
 function macro_get_plain_argument($number)
@@ -106,10 +106,10 @@ function macro_get_plain_argument($number)
 }
 
 /**
- * Convert path to class name 
- * 
+ * Convert path to class name
+ *
  * @param string $path Path
- *  
+ *
  * @return string
  */
 function macro_convert_path_to_class_name($path)
@@ -125,10 +125,10 @@ function macro_convert_path_to_class_name($path)
 }
 
 /**
- * Convert class name to path 
- * 
+ * Convert class name to path
+ *
  * @param string $class Class name
- *  
+ *
  * @return string
  */
 function macro_convert_class_name_to_path($class)
@@ -138,10 +138,10 @@ function macro_convert_class_name_to_path($class)
 
 /**
  * Safe write to file
- * 
+ *
  * @param string $path Path
  * @param string $data File content
- *  
+ *
  * @return void
  */
 function macro_file_put_contents($path, $data)
@@ -157,9 +157,9 @@ function macro_file_put_contents($path, $data)
 
 /**
  * Chec path - path is entity class or not
- * 
+ *
  * @param string $path path
- *  
+ *
  * @return boolean
  */
 function macro_is_entity($path)
@@ -168,12 +168,12 @@ function macro_is_entity($path)
 }
 
 /**
- * Assemble full class name 
- * 
+ * Assemble full class name
+ *
  * @param string $suffix       Class short name
  * @param string $moduleAuthor Module author OPTIONAL
  * @param string $moduleName   Module name OPTIONAL
- *  
+ *
  * @return string
  */
 function macro_assemble_class_name($suffix, $moduleAuthor = null, $moduleName = null)
@@ -215,9 +215,9 @@ function macro_get_class_short_name($class)
 
 /**
  * Convert camel case string to human readable string
- * 
+ *
  * @param string $camel Camel case string
- *  
+ *
  * @return string
  */
 function macro_convert_camel_to_human_readable($camel)
@@ -255,10 +255,10 @@ function macro_print_csv(array $data)
 // {{{ Arguments checkers
 
 /**
- * Check file path 
- * 
+ * Check file path
+ *
  * @param string &$path Path
- *  
+ *
  * @return void
  */
 function macro_check_file_path(&$path)
@@ -275,10 +275,10 @@ function macro_check_file_path(&$path)
 }
 
 /**
- * Check class repo file path 
- * 
+ * Check class repo file path
+ *
  * @param string $path Path
- *  
+ *
  * @return void
  */
 function macro_check_class_file_path($path)
@@ -306,10 +306,10 @@ function macro_check_class(&$class)
 
 /**
  * Check module name
- * 
+ *
  * @param string $author Author
  * @param string $module Name
- *  
+ *
  * @return void
  */
 function macro_check_module($author, $module)
@@ -329,10 +329,10 @@ function macro_check_module($author, $module)
 // {{{ Templates
 
 /**
- * Get file header 
- * 
+ * Get file header
+ *
  * @param string $path Path
- *  
+ *
  * @return string
  */
 function macro_get_file_header($path)
@@ -342,25 +342,29 @@ function macro_get_file_header($path)
 // vim: set ts=4 sw=4 sts=4 et:
 
 /**
- * LiteCommerce
+ * X-Cart
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the Open Software License (OSL 3.0)
+ * This source file is subject to the software license agreement
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
+ * http://www.x-cart.com/license-agreement.html
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to licensing@litecommerce.com so we can send you a copy immediately.
+ * to licensing@x-cart.com so we can send you a copy immediately.
  *
- * PHP version 5.3.0
+ * DISCLAIMER
  *
- * @category  LiteCommerce
- * @author    Creative Development LLC <info@cdev.ru>
- * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
- * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- * @link      http://www.litecommerce.com/
+ * Do not modify this file if you wish to upgrade X-Cart to newer versions
+ * in the future. If you wish to customize X-Cart for your needs please
+ * refer to http://www.x-cart.com/ for more information.
+ *
+ * @category  X-Cart 5
+ * @author    Qualiteam software Ltd <info@x-cart.com>
+ * @copyright Copyright (c) 2011-2013 Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license   http://www.x-cart.com/license-agreement.html X-Cart 5 License Agreement
+ * @link      http://www.x-cart.com/
  */
 
 
@@ -368,10 +372,10 @@ HEAD;
 }
 
 /**
- * Get class file repo header 
- * 
+ * Get class file repo header
+ *
  * @param string $path Path
- *  
+ *
  * @return string
  */
 function macro_get_class_repo_header($path)
@@ -389,10 +393,10 @@ HEAD;
 }
 
 /**
- * Get class header 
- * 
+ * Get class header
+ *
  * @param string $path Path
- *  
+ *
  * @return string
  */
 function macro_get_class_header($path)

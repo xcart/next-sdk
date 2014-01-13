@@ -4,9 +4,9 @@
 
 /**
  * LiteCommerce
- * 
+ *
  * NOTICE OF LICENSE
- * 
+ *
  * This source file is subject to the Open Software License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
@@ -14,11 +14,11 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to licensing@litecommerce.com so we can send you a copy immediately.
- * 
+ *
  * PHP version 5.3.0
- * 
+ *
  * @category  LiteCommerce
- * @author    Creative Development LLC <info@cdev.ru> 
+ * @author    Creative Development LLC <info@cdev.ru>
  * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      http://www.litecommerce.com/
@@ -32,6 +32,7 @@ require_once __DIR__ . '/core.php';
 
 // Get arguments
 $entityClass = macro_get_named_argument('entity');
+$entityRelativeClass = macro_get_named_argument('entityRelative');
 $fields      = macro_get_named_argument('fields');
 
 $editableFields = macro_get_named_argument('edit');
@@ -75,7 +76,7 @@ if (!is_subclass_of($entityClass, 'XLite\Model\AEntity')) {
 $entityRepoClass = str_replace('\\Model\\', '\\Model\\Repo\\', $entityClass);
 
 preg_match('/\\\Model\\\(.+)$/Ss', $entityClass, $match);
-$entityRelativeClass = $match[1];
+$entityRelativeClass = is_null($entityRelativeClass) ? $match[1] : $entityRelativeClass;
 $entityShortClass = macro_get_class_short_name($entityClass);
 $alias = strtolower(substr($entityShortClass, 0, 1));
 
@@ -380,7 +381,7 @@ class $targetShort extends \\XLite\\View\\AView
 
     /**
      * Check - search box is visible or not
-     * 
+     *
      * @return boolean
      */
     protected function isSearchVisible()
@@ -409,8 +410,8 @@ $string = <<<CODE
 
 {**
  * $targetHumanReadableName page template
- *  
- * @author    Creative Development LLC <info@cdev.ru> 
+ *
+ * @author    Creative Development LLC <info@cdev.ru>
  * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      http://www.litecommerce.com/
@@ -532,7 +533,7 @@ CODE;
 {**
  * $fieldHumanReadable condition
  *
- * @author    Creative Development LLC <info@cdev.ru> 
+ * @author    Creative Development LLC <info@cdev.ru>
  * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      http://www.litecommerce.com/
@@ -700,7 +701,7 @@ CODE;
 
         macro_file_put_contents($path, $string);
         echo 'done' . PHP_EOL;
-        
+
     }
 }
 
@@ -1215,8 +1216,8 @@ $string = <<<CODE
 
 /**
  * $targetHumanReadableName list styles
- *  
- * @author    Creative Development LLC <info@cdev.ru> 
+ *
+ * @author    Creative Development LLC <info@cdev.ru>
  * @copyright Copyright (c) 2011-2012 Creative Development LLC <info@cdev.ru>. All rights reserved
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  * @link      http://www.litecommerce.com/
@@ -1616,7 +1617,7 @@ class $targetOneShort extends \\XLite\\Controller\\Admin\\AAdmin
 
     /**
      * Get model form class
-     * 
+     *
      * @return string
      */
     protected function getModelFormClass()
