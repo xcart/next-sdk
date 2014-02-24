@@ -21,17 +21,17 @@
   timeoutForSmallTests="1"
   timeoutForMediumTests="10"
   timeoutForLargeTests="60"
-  strict="true"
+  strict="false"
   verbose="true">
 
   <testsuites>
-    <testsuite name="Unit tests">
+    <testsuite name="Unit">
       <directory>./unit</directory>
     </testsuite>
-    <testsuite name="Integration tests">
+    <testsuite name="Integration">
       <directory>./integration</directory>
     </testsuite>
-    <testsuite name="Web tests">
+    <testsuite name="Web">
       <directory>./web</directory>
     </testsuite>
   </testsuites>
