@@ -55,7 +55,7 @@ class Config
         $configFile = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "config.php";
 
         if (file_exists($configFile) && false !== ($config = parse_ini_file($configFile, true))) {
-            static::$config;
+            static::$config = $config;
         } else {
             die('Config file not found: ' . $configFile);
         }
