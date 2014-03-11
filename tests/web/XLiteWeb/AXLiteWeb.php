@@ -57,4 +57,17 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
 
         parent::tearDown();
     }
+    
+    /**
+     * 
+     */
+    public function getPage($path)
+    {
+        $var = '\\XLiteWeb\\Pages\\' . $path;
+        if (strpos($path, 'Admin') === 0) {
+            return new $var($this->backendDriver);
+        } elseif (strpos($path, 'Customer') === 0) {
+            return new $var($this->storefrontDriver);
+        }
+    }
 } 
