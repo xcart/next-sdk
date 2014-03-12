@@ -7,13 +7,14 @@
  */
 
 namespace XLiteWeb;
+use XLiteTest\Framework\Config;
 
 /**
  * Description of Page
  *
  * @author givi
  */
-class Page extends \RemoteWebDriver{
+class Page {
     /**
     * Description of Page
     *
@@ -22,10 +23,22 @@ class Page extends \RemoteWebDriver{
     protected $driver;
     
     /**
+    * Base URL
+    *
+    * @var  String
+    */
+    protected $storeUrl;
+    
+    /**
      * @findBy 'cssSelector'
      * @var \WebDriverBy
      */
     protected $errorMessage = '.error';
+    
+    public function getConfig($section, $key)
+    {
+        return Config::getInstance()->getOptions($section, $key);
+    }
     
     public function initializeComponents()
     {
@@ -44,12 +57,13 @@ class Page extends \RemoteWebDriver{
         }
     }
     
-    public function __construct(\RemoteWebDriver $driver) {
+    public function __construct(\RemoteWebDriver $driver, $storeUrl) {
         $this->initializeComponents();
         $this->driver = $driver;
+        $this->storeUrl = $storeUrl;
     }
     
-    public function load() {
+    public function load($autologin = false) {
         return true;
     }
     

@@ -1,6 +1,6 @@
 <?php
 namespace XLiteWeb\tests;
-use XLiteTest\Framework\Config;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -21,8 +21,8 @@ class testLogin extends \XLiteWeb\AXLiteWeb{
         $login->load();
         $this->assertTrue($login->validate(),'Submit button not found');
         
-        $userName = Config::getInstance()->getOptions('admin_user', 'username');
-        $password = Config::getInstance()->getOptions('admin_user', 'password');
+        $userName = $this->getConfig('admin_user', 'username');
+        $password = $this->getConfig('admin_user', 'password');
         
         $login->inputEmail($userName);
         $login->inputPassword($password);

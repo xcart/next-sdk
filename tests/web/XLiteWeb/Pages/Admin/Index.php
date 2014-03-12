@@ -13,14 +13,9 @@ namespace XLiteWeb\Pages\Admin;
  *
  * @author givi
  */
-class Index extends \XLiteWeb\Page{
-    /**
-     * @findBy 'cssSelector'
-     * @var \WebDriverBy
-     */
-    protected $logOffLink = ".link-item.logoff>a>span";
-    
+class Index extends \XLiteWeb\AdminPage{
+        
     public function validate() {
-        return $this->isElementPresent($this->logOffLink);
+        return $this->isLogedIn();
     }
 }

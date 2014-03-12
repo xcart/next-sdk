@@ -16,14 +16,16 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
      *
      * @var \WebDriver
      */
-    protected $storefrontDriver;
+    private $storefrontDriver = null;
 
     /**
      * Backend browser
      *
      * @var \WebDriver
      */
-    protected $backendDriver;
+    private $backendDriver = null;
+    
+    protected $capabilities = null;
 
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -33,17 +35,17 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
     public function setUp()
     {
 
-        $capabilities = array(
+        $this->capabilities = array(
             \WebDriverCapabilityType::BROWSER_NAME => Config::getInstance()->getOptions('web_driver', 'browser_name')
         );
 
-        // Start storefront browser
-        $this->storefrontDriver = \RemoteWebDriver::create(Config::getInstance()->getOptions('web_driver', 'driver_url'), $capabilities);
-
-        // Start backend browser
-        $this->backendDriver = \RemoteWebDriver::create(Config::getInstance()->getOptions('web_driver', 'driver_url'), $capabilities);
 
         parent::setUp();
+    }
+    
+    public function getConfig($section, $key)
+    {
+        return Config::getInstance()->getOptions($section, $key);
     }
 
     /**
@@ -52,22 +54,44 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
      */
     public function tearDown()
     {
-        $this->storefrontDriver->close();
-        $this->backendDriver->close();
+        if ($this->storefrontDriver != null) {
+            $this->storefrontDriver->close();
+        }
+        if ($this->backendDriver != null) {
+            $this->backendDriver->close();
+        }
 
         parent::tearDown();
     }
     
+    public function getBackendDriver() {
+        if ($this->backendDriver == null) {
+            // Start backend browser
+            $this->backendDriver = \RemoteWebDriver::create($this->getConfig('web_driver', 'driver_url'), $this->capabilities);
+        }
+        return $this->backendDriver;
+    }
+    
+    public function getStorefrontDriver() {
+        if ($this->storefrontDriver == null) {        
+            // Start storefront browser
+            $this->storefrontDriver = \RemoteWebDriver::create($this->getConfig('web_driver', 'driver_url'), $this->capabilities);
+        }
+        return $this->storefrontDriver;
+    }
+
+    
     /**
-     * 
+     * @return \XLiteWeb\Pages\Customer\Index
      */
     public function getPage($path)
     {
+        $store_url = $this->getConfig('web_driver', 'store_url');
         $var = '\\XLiteWeb\\Pages\\' . $path;
         if (strpos($path, 'Admin') === 0) {
-            return new $var($this->backendDriver);
+            return new $var($this->getBackendDriver(), $store_url);
         } elseif (strpos($path, 'Customer') === 0) {
-            return new $var($this->storefrontDriver);
+            return new $var($this->getStorefrontDriver(), $store_url);
         }
     }
 } 

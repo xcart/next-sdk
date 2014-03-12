@@ -13,7 +13,7 @@ namespace XLiteWeb\Pages\Admin;
  *
  * @author givi
  */
-class Login extends \XLiteWeb\Page{
+class Login extends \XLiteWeb\AdminPage{
     /**
      * @findBy 'xpath'
      * @var \WebDriverBy
@@ -36,8 +36,8 @@ class Login extends \XLiteWeb\Page{
         return $this->isElementPresent($this->submitButton);
     }
     
-    public function load() {
-        $this->driver->get('http://local.dev/branches/5.0.x/admin.php');
+    public function load($autologin = false) {
+        $this->driver->get($this->storeUrl . 'admin.php');
     }
     
     public function submit() {
