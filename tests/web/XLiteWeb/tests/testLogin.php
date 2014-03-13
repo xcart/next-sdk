@@ -15,7 +15,7 @@ namespace XLiteWeb\tests;
 class testLogin extends \XLiteWeb\AXLiteWeb{
     
     
-    public function testLogin() {
+    public function testAdminLogin() {
         
         $login = $this->getPage('Admin\Login');
         $login->load();

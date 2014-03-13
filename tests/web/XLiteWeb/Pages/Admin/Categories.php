@@ -75,7 +75,7 @@ class Categories extends \XLiteWeb\AdminPage{
         return $this->driver->findElement($this->lastCategoryName)->getText();
     }
     
-    public function getLastCategoryId() {
+    public function getLastAddedCategoryId() {
         $data = $this->driver->findElement($this->listLastLine)->getAttribute('class');
         $matches = array();
         preg_match('/entity-([0-9]+)/', $data, $matches);
@@ -89,6 +89,8 @@ class Categories extends \XLiteWeb\AdminPage{
     {
         $editLink = \WebDriverBy::cssSelector("tr[class$='entity-$categoryId'] a[class='edit']");
         $this->driver->findElement($editLink)->click();
+        
+        return $this;
     }
 
            
@@ -96,8 +98,7 @@ class Categories extends \XLiteWeb\AdminPage{
     {
         $editLink = \WebDriverBy::cssSelector("tr[class$='entity-$categoryId'] button[class='remove']");
         $this->driver->findElement($editLink)->click();
+        
+        return $this;    
     }
-    
-
-
 }

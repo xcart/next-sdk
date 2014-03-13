@@ -12,5 +12,9 @@ password="guest"
 [web_driver]
 browser_name="chrome"
 driver_url="http://local.dev:4444/wd/hub"
+store_url="http://local.dev/next/src/"
+implicitlyWait=5
+pageLoadTimeout=10
+scriptTimeout=10
 
 ; */ ?>

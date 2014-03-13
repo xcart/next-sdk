@@ -27,20 +27,22 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
         $categories->inputCategoryName($dataset['testData']['name']);
         $categories->SaveChanges();
         
-        $this->assertEquals($dataset['testData']['name'],$categories->getLastCategoryName(),'Category name does not match');
-        $categoryId = $categories->getLastCategoryId();
-        $this->assertGreaterThan(0, $categoryId, 'Error geting last categoryId');
+        $this->assertEquals($dataset['testData']['name'],
+                $categories->getLastCategoryName(),
+                'Category name does not match');
+        
+        $categoryId = $categories->getLastAddedCategoryId();
+        
+        $this->assertGreaterThan(0, $categoryId,
+                'Error geting last categoryId');
         
         $categories->editCategory($categoryId);
         
         $categoryUpdate = $this->getPage('Admin\CategoryUpdate');
-        $categoryUpdate->inputAvailability($dataset['testData']['availability']);
-        $categoryUpdate->inputDescription($dataset['testData']['description']);
-        $categoryUpdate->inputMeta_title($dataset['testData']['meta_title']);
-        $categoryUpdate->inputMeta_keywords($dataset['testData']['meta_keywords']);
-        $categoryUpdate->inputMeta_desc($dataset['testData']['meta_desc']);
-        $categoryUpdate->inputMemberships($dataset['testData']['memberships']);
         
+        $formData = $dataset['testData'];
+        unset($formData['name']);
+        $categoryUpdate->fillForm($formData);
         $categoryUpdate->Update();
         
         //TODO: добавить проверку полей после сохранения
@@ -77,10 +79,10 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
                 'name'          => 'Test category 1',
                 'description'   => 'Description of test category 1!!!',
                 'memberships'    => array(),//'No membership',
-                'availability'  => 'Yes',
-                'meta_title'    => 'Test category title',
-                'meta_keywords' => 'test, category',
-                'meta_desc'    => 'test category meta description',
+                'enabled'  => 'Y',
+                'meta-title'    => 'Test category title',
+                'meta-tags' => 'test, category',
+                'meta-desc'    => 'test category meta description',
             ),
             'results'=>array(
                 'availInStorefront'=>true,
@@ -94,10 +96,10 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
                 'name'          => 'Test category 2',
                 'description'   => 'Description <b>of</b> test category 2!!!',
                 'memberships'    => array(),//'No membership',
-                'availability'  => 'No',
-                'meta_title'    => 'Test category title',
-                'meta_keywords' => 'test, category',
-                'meta_desc'    => 'test category meta description',
+                'enabled'  => 'N',
+                'meta-title'    => 'Test category title',
+                'meta-tags' => 'test, category',
+                'meta-desc'    => 'test category meta description',
             ),
             'results'=>array(
                 'availInStorefront'=>false,
@@ -110,17 +112,17 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
             'testData'=>array(
                 'name'          => 'Test category 3',
                 'description'   => '',
-                'memberships'    => array('2'),//'Platinum',
-                'availability'  => 'Yes',
-                'meta_title'    => 'Test category title',
-                'meta_keywords' => 'test, category',
-                'meta_desc'    => 'test category meta description',
+                'memberships'    => array(2),//'Platinum',
+                'enabled'  => 'Y',
+                'meta-title'    => 'Test category title',
+                'meta-tags' => 'test, category',
+                'meta-desc'    => 'test category meta description',
             ),
             'results'=>array(
                 'availInStorefront'=>false,
             )
         ));
-              
+
         return $datasets;
     }
 }
