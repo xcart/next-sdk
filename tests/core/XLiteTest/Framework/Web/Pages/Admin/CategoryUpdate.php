@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb\Pages\Admin;
+namespace XLiteTest\Framework\Web\Pages\Admin;
 
 /**
  * Description of Categories
  *
  * @author givi
  */
-class CategoryUpdate extends \XLiteWeb\AdminPage{
+class CategoryUpdate extends \XLiteTest\Framework\Web\Pages\AdminPage{
     /**
      * used for load method
      * 

@@ -103,7 +103,7 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
      */
     public function getPage($path)
     {
-        $className = '\\XLiteWeb\\Pages\\' . $path;
+        $className = '\\XLiteTest\\Framework\\Web\\Pages\\' . $path;
         if (strpos($path, 'Admin') === 0) {
             $driver = $this->getBackendDriver();
         } elseif (strpos($path, 'Customer') === 0) {

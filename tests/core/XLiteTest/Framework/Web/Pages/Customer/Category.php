@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb\Pages\Customer;
+namespace XLiteTest\Framework\Web\Pages\Customer;
 
 /**
  * Description of Index
  *
  * @author givi
  */
-class Category extends \XLiteWeb\CustomerPage{
+class Category extends \XLiteTest\Framework\Web\Pages\CustomerPage{
         
     public function validate() {
         // не ясно к чему тут прицепится, страница категории такая же как и остальные

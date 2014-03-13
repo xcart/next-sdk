@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb;
+namespace XLiteTest\Framework\Web\Pages;
 
 
 /**
@@ -14,7 +14,7 @@ namespace XLiteWeb;
  *
  * @author givi
  */
-class CustomerPage extends \XLiteWeb\Page{
+class CustomerPage extends \XLiteTest\Framework\Web\Pages\Page{
     
     /**
      * @findBy 'cssSelector'

@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb\Pages\Admin;
+namespace XLiteTest\Framework\Web\Pages\Admin;
 
 /**
  * Description of Index
  *
  * @author givi
  */
-class Index extends \XLiteWeb\AdminPage{
+class Index extends \XLiteTest\Framework\Web\Pages\AdminPage{
         
     public function validate() {
         return $this->isLogedIn();

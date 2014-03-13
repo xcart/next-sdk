@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb;
+namespace XLiteTest\Framework\Web\Pages;
 
 
 /**
@@ -14,7 +14,7 @@ namespace XLiteWeb;
  *
  * @author givi
  */
-class AdminPage extends \XLiteWeb\Page{
+class AdminPage extends \XLiteTest\Framework\Web\Pages\Page{
     
     /**
      * @findBy 'cssSelector'
@@ -45,7 +45,7 @@ class AdminPage extends \XLiteWeb\Page{
             $password = $this->getConfig('admin_user', 'password');
         }
         
-        $login = new \XLiteWeb\Pages\Admin\Login($this->driver, $this->storeUrl);
+        $login = new \XLiteTest\Framework\Web\Pages\Admin\Login($this->driver, $this->storeUrl);
         if (!$login->validate()) {
             return false;
         }

@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb\Pages\Admin;
+namespace XLiteTest\Framework\Web\Pages\Admin;
 
 /**
  * Description of Categories
  *
  * @author givi
  */
-class Categories extends \XLiteWeb\AdminPage{
+class Categories extends \XLiteTest\Framework\Web\Pages\AdminPage{
     /**
      * @findBy 'cssSelector'
      * @var \WebDriverBy

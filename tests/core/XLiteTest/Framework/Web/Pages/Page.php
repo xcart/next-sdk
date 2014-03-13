@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb;
+namespace XLiteTest\Framework\Web\Pages;
 use XLiteTest\Framework\Config;
 
 /**

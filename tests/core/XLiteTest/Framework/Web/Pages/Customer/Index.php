@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb\Pages\Customer;
+namespace XLiteTest\Framework\Web\Pages\Customer;
 
 /**
  * Description of Index
  *
  * @author givi
  */
-class Index extends \XLiteWeb\CustomerPage{
+class Index extends \XLiteTest\Framework\Web\Pages\CustomerPage{
         
     public function validate() {
         return $this->isElementPresent($this->logInLink) || $this->isElementPresent($this->logOffLink);

@@ -6,14 +6,14 @@
  * and open the template in the editor.
  */
 
-namespace XLiteWeb\Pages\Admin;
+namespace XLiteTest\Framework\Web\Pages\Admin;
 
 /**
  * Description of login
  *
  * @author givi
  */
-class Login extends \XLiteWeb\AdminPage{
+class Login extends \XLiteTest\Framework\Web\Pages\AdminPage{
     /**
      * @findBy 'xpath'
      * @var \WebDriverBy
