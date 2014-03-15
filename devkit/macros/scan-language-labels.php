@@ -427,8 +427,9 @@ Usage: $script [--result=<mode>] [--language=<language_code>] [--output=<output_
 
     --result=<mode>
         Result mode. Variants:
-            check-db   - check DB (default)
-            check-code - check only code
+            check-db        - check DB (default)
+            check-code      - check only code
+            check-partially - check DB (partyally)
 
     --language=<language_code>
         Language code
@@ -437,6 +438,7 @@ Usage: $script [--result=<mode>] [--language=<language_code>] [--output=<output_
         Output mode. Variants:
             human-readable - human redable (default)
             yaml           - as YAML
+            csv            - as CSV
 
 Example: .dev/macro/$script
 
