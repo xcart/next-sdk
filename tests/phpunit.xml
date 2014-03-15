@@ -32,7 +32,7 @@
       <directory>./integration</directory>
     </testsuite>
     <testsuite name="Web tests">
-      <directory>./wev</directory>
+      <directory>./web</directory>
     </testsuite>
   </testsuites>
 
