@@ -358,7 +358,7 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 		return;
 
 		if (preg_match('/____\w+____/', $value)) {
-			$error = 'ôÅÇ @' . $tag  . ' ÉÍÅÅÔ ÄÅÆÏÌÔÎÏÅ ÚÎÁÞÅÎÉÅ. åÇÏ ÎÅÏÂÈÏÄÉÍÏ ÓÍÅÎÉÔØ';
+			$error = 'Ð¢ÐµÐ³ @' . $tag  . ' Ð¸Ð¼ÐµÐµÑ‚ Ð´ÐµÑ„Ð¾Ð»Ñ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ. Ð•Ð³Ð¾ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑÐ¼ÐµÐ½Ð¸Ñ‚ÑŒ';
 			$this->currentFile->addError($this->getReqPrefix($this->reqCodeDefault) . $error, $line);
 			return true;
 		}
@@ -373,21 +373,21 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 		foreach ($gotchas as $g) {
 			if (!in_array($g['name'], array('TODO', 'FIXME', 'KLUDGE', 'TRICKY', 'WARNING', 'PARSER'))) {
 				$this->currentFile->addError(
-					$this->getReqPrefix('REQ.PHP.4.2.1') . 'ðÒÉ ÉÓÐÏÌØÚÏ×ÁÎÉÉ gotchas ÎÅÏÂÈÏÄÉÍÏ ÉÓÐÏÌØÚÏ×ÁÔØ ÚÁÒÅÚÅÒ×ÉÒÏ×ÁÎÎÙÅ ÓÌÏ×Á',
+					$this->getReqPrefix('REQ.PHP.4.2.1') . 'ÐŸÑ€Ð¸ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ð¸ gotchas Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð°Ñ€ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ðµ ÑÐ»Ð¾Ð²Ð°',
 					$g['begin']
 				);
 			}
 
 			if ($g['begin'] != $lastPos + 1) {
                 $this->currentFile->addError(
-                    $this->getReqPrefix('REQ.PHP.4.2.2') . 'ëÌÀÞÅ×ÏÅ ÓÌÏ×Ï gotcha ÄÏÌÖÎÏ ÓÔÁ×ÉÔØÓÑ × ÓÁÍÏÍ ÎÁÞÁÌÅ ËÏÍÍÅÎÔÁÒÉÑ',
+                    $this->getReqPrefix('REQ.PHP.4.2.2') . 'ÐšÐ»ÑŽÑ‡ÐµÐ²Ð¾Ðµ ÑÐ»Ð¾Ð²Ð¾ gotcha Ð´Ð¾Ð»Ð¶Ð½Ð¾ ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑŒÑÑ Ð² ÑÐ°Ð¼Ð¾Ð¼ Ð½Ð°Ñ‡Ð°Ð»Ðµ ÐºÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ñ',
                     $g['begin']
                 );
 			}
 
 			if ($g['link']['type'] && !in_array($g['link']['type'], array('M', 'E', 'S', 'G'))) {
                 $this->currentFile->addError(
-                    $this->getReqPrefix('REQ.PHP.4.2.4') . 'ôÉÐ ÓÓÙÌÉ ÄÏÌÖÅÎ ÂÙÔØ M ÉÌÉ E ÉÌÉ S ÉÌÉ G',
+                    $this->getReqPrefix('REQ.PHP.4.2.4') . 'Ð¢Ð¸Ð¿ ÑÑÑ‹Ð»Ð¸ Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ M Ð¸Ð»Ð¸ E Ð¸Ð»Ð¸ S Ð¸Ð»Ð¸ G',
                     $g['begin']
                 );
 			}
@@ -526,8 +526,8 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 	{
 		$result = array(true, $content);
 
-		if (PHP_CodeSniffer::isUnderscoreName($content) !== true) {
-			$result = array(false, $this->sanitazeUnderscoreName($content));
+		if ('X-Cart 5' != $content) {
+			$result = array(false, 'X-Cart 5');
 		}
 
 		return $result;
@@ -631,8 +631,8 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
             foreach ($authors as $author) {
                 $errorPos = ($commentStart + $author->getLine());
                 $content  = $author->getContent();
-                if ($this->isInternalProject() && $content !== 'Creative Development LLC <info@cdev.ru>') {
-                    $error = 'Content of the @author tag must be in the form "Creative Development LLC <info@cdev.ru>"';
+                if ($this->isInternalProject() && $content !== 'Qualiteam software Ltd <info@x-cart.com>') {
+                    $error = 'Content of the @author tag must be in the form "Qualiteam software Ltd <info@x-cart.com>"';
                     $this->currentFile->addError($this->getReqPrefix($this->getReqCode($this->reqCodesWrongFormat, 'author')) . $error, $errorPos);
 
                 } elseif (!$content)  {
@@ -654,9 +654,9 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 				if ($this->isInternalProject()) {
 		            $bYear = '2011';
     		        $eYear = @date('Y');
-        		    $text = 'Copyright (c) ' . (($bYear == $eYear) ? $bYear : $bYear . '-' . $eYear) . ' Creative Development LLC <info@cdev.ru>. All rights reserved';
+        		    $text = 'Copyright (c) ' . (($bYear == $eYear) ? $bYear : $bYear . '-' . $eYear) . ' Qualiteam software Ltd <info@x-cart.com>. All rights reserved';
                     $eYear2 = $eYear - 1;
-                    $text2 = 'Copyright (c) ' . (($bYear == $eYear2) ? $bYear : $bYear . '-' . $eYear2) . ' Creative Development LLC <info@cdev.ru>. All rights reserved';
+                    $text2 = 'Copyright (c) ' . (($bYear == $eYear2) ? $bYear : $bYear . '-' . $eYear2) . ' Qualiteam software Ltd <info@x-cart.com>. All rights reserved';
             		if ($content !== $text && $content !== $text2) {
                 		$error = 'Content of the @copyright tag must be in the form "' . $text . '"';
 	                	$this->currentFile->addError($this->getReqPrefix($this->getReqCode($this->reqCodesWrongFormat, 'copyright')) . $error, $errorPos);
@@ -692,17 +692,19 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
                 $module = (isset($match[1]) ? $match[1] : null);
 
                 if (in_array($module, $this->modulesLCL)) {
+                    /*
                     $error = $content != 'LiteCommerce Module License (Commercial EULA)'
                         ? 'Content of the @license tag for module "' . $module . '" must be in the form "LiteCommerce Module License (Commercial EULA)"'
                         : null;
+                    */
 
                 } elseif (in_array($module, $this->modulesGPL)) {
                     $error = $content != 'http://www.gnu.org/licenses/gpl-2.0.html GNU General Pubic License (GPL 2.0)'
                         ? 'Content of the @license tag for module "' . $module . '" must be in the form "http://www.gnu.org/licenses/gpl-2.0.html GNU General Pubic License (GPL 2.0)"'
                         : null;
     
-                } elseif ($content != 'http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)') {
-                    $error = 'Content of the @license tag must be in the form "http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)"';
+                } elseif ($content != 'http://www.x-cart.com/license-agreement.html X-Cart 5 License Agreement') {
+                    $error = 'Content of the @license tag must be in the form "http://www.x-cart.com/license-agreement.html X-Cart 5 License Agreement"';
                 }
 
                 if ($error) {
@@ -772,8 +774,8 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 				$error = '@link tag must contain URL';
 				$this->currentFile->addError($this->getReqPrefix($this->reqCodeEmpty) . $error, $errorPos);
 
-			} elseif ($this->isInternalProject() && 'http://www.litecommerce.com/' != $link->getContent()) {
-                $error = '@link tag must contain http://www.litecommerce.com/';
+			} elseif ($this->isInternalProject() && 'http://www.x-cart.com/' != $link->getContent()) {
+                $error = '@link tag must contain http://www.x-cart.com/';
                 $this->currentFile->addError($this->getReqPrefix($this->reqCodeEmpty) . $error, $errorPos);
 			}
 		}
@@ -849,7 +851,7 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 			$this->commentParser->getReturn()->getComment()
 			&& preg_match('/^[a-z]/Ss', trim($this->commentParser->getReturn()->getComment()))
 		) {
-        	$error = 'ëÏÍÍÅÎÔÁÒÉÊ ÁÎÎÏÔÁÃÉÉ ×ÏÚ×ÒÁÔÁ ÍÅÔÏÄÁ ÎÁÞÉÎÁÅÔÓÑ Ó ÍÁÌÅÎØËÏÊ ÂÕË×Ù';
+        	$error = 'ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹ Ð°Ð½Ð½Ð¾Ñ‚Ð°Ñ†Ð¸Ð¸ Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‚Ð° Ð¼ÐµÑ‚Ð¾Ð´Ð° Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÑ‚ÑÑ Ñ Ð¼Ð°Ð»ÐµÐ½ÑŒÐºÐ¾Ð¹ Ð±ÑƒÐºÐ²Ñ‹';
             $this->currentFile->addError($this->getReqPrefix('?') . $error, $commentStart + $this->commentParser->getReturn()->getLine());
 		}
 
@@ -976,7 +978,7 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 
 					if (isset($realParams[($pos - 1)]['default']) && !preg_match('/ OPTIONAL$/Ss', $paramComment)) {
                         $this->currentFile->addError(
-							$this->getReqPrefix('REQ.PHP.3.5.18') . 'ðÅÒÅÍÅÎÎÁÑ "' . $paramName . '" ÏÐÃÉÏÎÁÌØÎÁÑ, ÎÏ ÓÌÕÖÅÂÎÏÇÏ ÔÜÇÁ OPTIONAL ÅÅ ËÏÍÍÅÎÔÁÒÉÊ ÎÅ ÉÍÅÅÔ',
+							$this->getReqPrefix('REQ.PHP.3.5.18') . 'Argument "' . $paramName . '" has default value, argument comment must OPTIONAL suffix',
 							$errorPos
 						);
 					}
@@ -1002,7 +1004,7 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
                     $this->currentFile->addError($this->getReqPrefix('REQ.PHP.4.1.26') . $error, $errorPos);
 
 				} elseif (preg_match('/^[a-z]/Ss', trim($paramComment))) {
-                    $error = 'ëÏÍÍÅÎÔÁÒÉÊ ÐÁÒÁÍÅÔÒÁ "' . $paramName . '" ÎÁÞÉÎÁÅÔÓÑ Ó ÍÁÌÅÎØËÏÊ ÂÕË×Ù';
+                    $error = 'ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð° "' . $paramName . '" Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÑ‚ÑÑ Ñ Ð¼Ð°Ð»ÐµÐ½ÑŒÐºÐ¾Ð¹ Ð±ÑƒÐºÐ²Ñ‹';
                     $this->currentFile->addError($this->getReqPrefix('REQ.PHP.4.5.8') . $error, $errorPos);
 
 				}
@@ -1104,7 +1106,7 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
                 "\n"
             );
             $this->currentFile->addError(
-                $this->getReqPrefix('REQ.PHP.4.1.25') . 'úÎÁÞÅÎÉÅ ÔÜÇÁ @access ÎÅ ÓÏ×ÐÁÄÁÅÔ Ó ÄÅËÌÁÒÁÃÉÅÊ (ÄÅËÌÁÒÉÒÏ×ÁÎÎÏ ËÁË ' . $tokens[$type]['content']. ', Á @access ÒÁ×ÅÎ ' . $access->getValue() . ')',
+                $this->getReqPrefix('REQ.PHP.4.1.25') . 'Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ñ‚ÑÐ³Ð° @access Ð½Ðµ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÐµÑ‚ Ñ Ð´ÐµÐºÐ»Ð°Ñ€Ð°Ñ†Ð¸ÐµÐ¹ (Ð´ÐµÐºÐ»Ð°Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ð¾ ÐºÐ°Ðº ' . $tokens[$type]['content']. ', Ð° @access Ñ€Ð°Ð²ÐµÐ½ ' . $access->getValue() . ')',
                 $commentStart + $cnt
             );
         }

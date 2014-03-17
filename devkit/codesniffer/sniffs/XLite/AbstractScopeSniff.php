@@ -171,7 +171,10 @@ abstract class XLite_AbstractScopeSniff extends XLite_NameSniff
 
         if (in_array($tokens[$stackPtr]['code'], $this->_scopeTokens) === true) {
             $this->currScope = $stackPtr;
-            $phpcsFile->addTokenListener($this, $this->_tokens);
+            // Bug into - conflict - PHP_CodeSniffer_File::addTokenListener and PHP_CodeSniffer_File::start
+            // $this->_listeners must store array - but PHP_CodeSniffer_File::addTokenListener add object
+            //$phpcsFile->addTokenListener($this, $this->_tokens);
+
         } else if ($this->currScope !== null
             && isset($tokens[$this->currScope]['scope_closer']) === true
             && $stackPtr > $tokens[$this->currScope]['scope_closer']

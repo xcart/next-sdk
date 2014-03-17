@@ -95,7 +95,7 @@ class XLite_Sniffs_PHP_NamingConventions_ValidClassNameSniff extends XLite_NameS
 
 		list($res, $paths) = $this->checkClassPath($nameBits, $ns);
 		if (!$res) {
-			$error = "Пути до файла с объявлением класса '" .$name . "' не существуют (" .implode('; ', $paths). ")";
+			$error = "Пути до файла с объявлением класса '" . $name . "' не существуют (" . implode('; ', $paths) . ")";
 			$phpcsFile->addError($this->getReqPrefix('REQ.PHP.1.3.3') . $error, $stackPtr);
 		}
 

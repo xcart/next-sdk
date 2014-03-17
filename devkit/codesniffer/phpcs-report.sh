@@ -25,4 +25,4 @@ fi
 
 standard=`pwd`/$base/sniffs/XLite
 
-/usr/bin/env php $base/phpcs.php -s --report=full --standard=$standard $files_list
+/usr/bin/env php $base/phpcs.php -s --report=full --standard=$standard --ignore=upgrade,lib $files_list
