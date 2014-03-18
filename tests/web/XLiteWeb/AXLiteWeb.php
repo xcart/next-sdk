@@ -6,7 +6,20 @@ use XLiteTest\Framework\Config;
 
 /**
  * Abstract web test case
- *
+ * 
+ * autocomplite section
+ * 
+ * Admin
+ * @property \XLiteTest\Framework\Web\Pages\Admin\Login $AdminLogin
+ * @property \XLiteTest\Framework\Web\Pages\Admin\Index $AdminIndex
+ * @property \XLiteTest\Framework\Web\Pages\Admin\Categories $AdminCategories
+ * @property \XLiteTest\Framework\Web\Pages\Admin\CategoryUpdate $AdminCategoryUpdate
+ * @property \XLiteTest\Framework\Web\Pages\Admin\ProductAdd $AdminProductAdd
+ * 
+ * Customer
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Category $CustomerCategory
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Index $CustomerIndex
+ * 
  * @package XLiteWeb
  */
 abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
@@ -97,11 +110,24 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
         return $this->storefrontDriver;
     }
 
+    public function __get($name) {
+        $path = '';
+        if (strpos($name, 'Admin') === 0) {
+            
+            $path = 'Admin\\' . substr($name, 5);
+            
+        } elseif (strpos($name, 'Customer') === 0) {
+            
+            $path = 'Customer\\' . substr($name, 8);
+            
+        } else {
+            throw new \Exception('Error in magic method __get.');
+        }
+        
+        return $this->getPage($path);
+    }
     
-    /**
-     * @return \XLiteWeb\Pages\Customer\Index
-     */
-    public function getPage($path)
+    private function getPage($path)
     {
         $className = '\\XLiteTest\\Framework\\Web\\Pages\\' . $path;
         if (strpos($path, 'Admin') === 0) {

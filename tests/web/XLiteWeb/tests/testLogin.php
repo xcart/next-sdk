@@ -17,7 +17,7 @@ class testLogin extends \XLiteWeb\AXLiteWeb{
     
     public function testAdminLogin() {
         
-        $login = $this->getPage('Admin\Login');
+        $login = $this->AdminLogin;
         $login->load();
         $this->assertTrue($login->validate(),'Submit button not found');
         
@@ -30,7 +30,7 @@ class testLogin extends \XLiteWeb\AXLiteWeb{
         $login->submit();
         $this->assertFalse($login->isErrorOnPage(),$login->getErrorText());
 
-        $dashBoard = $this->getPage('Admin\Index');
+        $dashBoard = $this->AdminIndex;
         $this->assertTrue($dashBoard->validate(), 'Error login in to ADMIN zone.');
     }
 }

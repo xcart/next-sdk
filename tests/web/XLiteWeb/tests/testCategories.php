@@ -19,7 +19,7 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
      */
     public function testAddCategory($dataset) {
         
-        $categories = $this->getPage('Admin\Categories');
+        $categories = $this->AdminCategories;
         $this->assertTrue($categories->load(true), 'Error loading categories page.');
         $this->assertTrue($categories->validate(),'Loaded page is not categories page.');
         
@@ -38,7 +38,7 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
         
         $categories->editCategory($categoryId);
         
-        $categoryUpdate = $this->getPage('Admin\CategoryUpdate');
+        $categoryUpdate = $this->AdminCategoryUpdate;
         
         $formData = $dataset['testData'];
         unset($formData['name']);
@@ -47,7 +47,7 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
         
         //TODO: добавить проверку полей после сохранения
         
-        $storeFront = $this->getPage('Customer\Index');
+        $storeFront = $this->CustomerIndex;
         $storeFront->load();
         $this->assertTrue($storeFront->validate(), 'Storefront is inaccessible.');
         
@@ -56,7 +56,7 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
             $this->assertNotFalse($categoryLink, 'Category link not present.');
             $categoryLink->click();
         
-            $category = $this->getPage('Customer\Category');
+            $category = $this->CustomerCategory;
             $this->assertEquals($dataset['testData']['name'], $category->pageTitle()->getText(), 'Page title does not match category name.');
         } else {
             $this->assertFalse($categoryLink, 'Disabled Category link present.');
