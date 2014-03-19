@@ -15,7 +15,7 @@ namespace XLiteTest\Framework\Web\Pages;
  * @author givi
  */
 class CustomerPage extends \XLiteTest\Framework\Web\Pages\Page{
-    
+
     /**
      * @findBy 'cssSelector'
      * @var \WebDriverBy
@@ -84,5 +84,10 @@ class CustomerPage extends \XLiteTest\Framework\Web\Pages\Page{
         return $this->driver->findElement($this->pageTitle);
     }
 
-
+    public function __get($name) {
+            
+        $path = '\\Customer\\Components\\' . substr($name, 9);
+    
+        return $this->createComponent($path);
+    }
 }

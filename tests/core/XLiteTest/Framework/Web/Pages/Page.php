@@ -14,7 +14,7 @@ use XLiteTest\Framework\Config;
  *
  * @author givi
  */
-class Page {
+class Page {    
     /**
     * Description of Page
     *
@@ -90,12 +90,41 @@ class Page {
         }
     }
     
-    public function isElementPresent(\WebDriverBy $by) {
+    public function isElementPresent(\WebDriverBy $by, \RemoteWebElement $element = null) {
+        if ($element == null) {
+            $driver = $this->driver;
+        } else {
+            $driver = $element;
+        }
         try {
-            $el = $this->driver->findElement($by);
+            $el = $driver->findElement($by);
             return true;
         } catch (\WebDriverException $e) {
             return false;
         }
+    }
+    
+    public function waitForAjax($timeout=30) {
+        if ($timeout <= 0) {
+            $timeout = 1;
+        }
+        
+        $timeout = $timeout * 2;
+        
+        while ($timeout > 0) {
+            usleep(500000);
+            if (!$this->isElementPresent(\WebDriverBy::cssSelector('div.block-wait'))) {
+                return $this;
+            }
+            $timeout--;
+        }
+        throw new Exception('Ajax wait timeout');
+    }
+   
+    protected function createComponent($path)
+    {
+        $className = '\\XLiteTest\\Framework\\Web\\Pages' . $path;
+
+        return new $className($this->driver, $this->storeUrl);
     }
 }

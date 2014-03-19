@@ -10,11 +10,12 @@ namespace XLiteTest\Framework\Web\Pages\Customer;
 
 /**
  * Description of Index
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Components\ItemList $componentItemList
  *
  * @author givi
  */
 class Category extends \XLiteTest\Framework\Web\Pages\CustomerPage{
-        
+    
     public function validate() {
         // не ясно к чему тут прицепится, страница категории такая же как и остальные
         return true;

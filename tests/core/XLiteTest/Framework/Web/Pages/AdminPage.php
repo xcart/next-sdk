@@ -97,4 +97,10 @@ class AdminPage extends \XLiteTest\Framework\Web\Pages\Page{
         }
     }
     
+     public function __get($name) {
+            
+        $path = '\\Admin\\Components\\' . substr($name, 9);
+    
+        return $this->createComponent($path);
+    }   
 }
