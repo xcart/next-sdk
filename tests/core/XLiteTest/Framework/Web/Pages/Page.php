@@ -22,6 +22,7 @@ class Page {
     */
     protected $driver;
     
+    protected $webElementsGetters = array();
     /**
     * Base URL
     *
@@ -53,6 +54,7 @@ class Page {
             if (1 == preg_match("/@findBy[ ]*'(.*)'/", $propertyAnnotation, $mathes)) {
                 $type = $mathes[1];
                 $this->$propertyName = \WebDriverBy::$type($this->$propertyName);
+                $this->webElementsGetters['get_' . $propertyName]=$propertyName;
             }
         }
     }
@@ -89,7 +91,12 @@ class Page {
             return '';
         }
     }
-    
+    /**
+     * 
+     * @param \WebDriverBy $by
+     * @param \RemoteWebElement $element
+     * @return boolean
+     */
     public function isElementPresent(\WebDriverBy $by, \RemoteWebElement $element = null) {
         if ($element == null) {
             $driver = $this->driver;
@@ -104,7 +111,10 @@ class Page {
         }
     }
     
-    public function waitForAjax($timeout=30) {
+    public function waitForAjax($timeout=30 ,\WebDriverBy $element = null) {
+        if ($element == null) {
+            $element = \WebDriverBy::cssSelector('div.block-wait');
+        } 
         if ($timeout <= 0) {
             $timeout = 1;
         }
@@ -113,18 +123,59 @@ class Page {
         
         while ($timeout > 0) {
             usleep(500000);
-            if (!$this->isElementPresent(\WebDriverBy::cssSelector('div.block-wait'))) {
+            if (!$this->isElementPresent($element)) {
                 return $this;
             }
             $timeout--;
         }
         throw new Exception('Ajax wait timeout');
     }
-   
+    
+    public function __get($name) {
+        if (isset($this->webElementsGetters[$name])) {
+            $propertyName = $this->webElementsGetters[$name];
+            $by = $this->$propertyName;
+            return $this->driver->findElement($by);
+        }
+        throw new Exception('Unknown property.');
+    }
+    
     protected function createComponent($path)
     {
         $className = '\\XLiteTest\\Framework\\Web\\Pages' . $path;
 
         return new $className($this->driver, $this->storeUrl);
+    }
+    
+    public function fillForm($data) {
+        foreach ($data as $element=>$value) {
+            $methodName = 'input' . ucfirst(str_replace('-', '_', $element));
+            if (method_exists ( $this, $methodName )) {
+                $this->$methodName($value);
+            } else {
+                $by = \WebDriverBy::cssSelector('#' . $element);
+                $webElement = $this->driver->findElement($by);
+                $tag = $this->driver->findElement($by)->getTagName();
+                
+                if ($tag == 'select' && !is_array($value)) {
+                    $Select = new \WebDriverSelect($webElement);
+                    $Select->selectByValue($value);
+                } elseif ($tag == 'select' && is_array($value)) {//multiselect
+                    $multiSelect = new \WebDriverSelect($webElement);
+                    $multiSelect->deselectAll();
+                    foreach ($value as $item) {
+                        $multiSelect->selectByValue($item);
+                    }
+                } elseif ($tag == 'textarea') {
+                    if ($webElement->isDisplayed()) {
+                        $webElement->sendKeys($value);
+                    } else {
+                        $this->driver->executeScript('$("#' . $element . '").text("' . $value . '");');
+                    }
+                } else {
+                    $webElement->sendKeys($value);
+                }
+            }
+        }
     }
 }

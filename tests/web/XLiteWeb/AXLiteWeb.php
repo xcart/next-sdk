@@ -15,10 +15,14 @@ use XLiteTest\Framework\Config;
  * @property \XLiteTest\Framework\Web\Pages\Admin\Categories $AdminCategories
  * @property \XLiteTest\Framework\Web\Pages\Admin\CategoryUpdate $AdminCategoryUpdate
  * @property \XLiteTest\Framework\Web\Pages\Admin\ProductAdd $AdminProductAdd
+ * @property \XLiteTest\Framework\Web\Pages\Admin\invoice $AdminInvoice
  * 
  * Customer
- * @property \XLiteTest\Framework\Web\Pages\Customer\Category $CustomerCategory
  * @property \XLiteTest\Framework\Web\Pages\Customer\Index $CustomerIndex
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Category $CustomerCategory
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Product $CustomerProduct
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Checkout $CustomerCheckout
+ * @property \XLiteTest\Framework\Web\Pages\Customer\invoice $CustomerInvoice
  * 
  * @package XLiteWeb
  */

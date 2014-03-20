@@ -65,42 +65,12 @@ class AdminPage extends \XLiteTest\Framework\Web\Pages\Page{
         return $this->driver->findElement($this->saveChangesButton)->click();
     }
 
-    public function fillForm($data) {
-        foreach ($data as $element=>$value) {
-            $methodName = 'input' . ucfirst(str_replace('-', '_', $element));
-            if (method_exists ( $this, $methodName )) {
-                $this->$methodName($value);
-            } else {
-                $by = \WebDriverBy::cssSelector('#' . $element);
-                $webElement = $this->driver->findElement($by);
-                $tag = $this->driver->findElement($by)->getTagName();
-                
-                if ($tag == 'select' && !is_array($value)) {
-                    $Select = new \WebDriverSelect($webElement);
-                    $Select->selectByValue($value);
-                } elseif ($tag == 'select' && is_array($value)) {//multiselect
-                    $multiSelect = new \WebDriverSelect($webElement);
-                    $multiSelect->deselectAll();
-                    foreach ($value as $item) {
-                        $multiSelect->selectByValue($item);
-                    }
-                } elseif ($tag == 'textarea') {
-                    if ($webElement->isDisplayed()) {
-                        $webElement->sendKeys($value);
-                    } else {
-                        $this->driver->executeScript('$("#' . $element . '").text("' . $value . '");');
-                    }
-                } else {
-                    $webElement->sendKeys($value);
-                }
-            }
-        }
-    }
-    
      public function __get($name) {
-            
-        $path = '\\Admin\\Components\\' . substr($name, 9);
+        if (strpos($name, 'component') === 0) { 
+            $path = '\\Admin\\Components\\' . substr($name, 9);
     
-        return $this->createComponent($path);
+            return $this->createComponent($path);
+        }
+        return parent::__get($name);
     }   
 }

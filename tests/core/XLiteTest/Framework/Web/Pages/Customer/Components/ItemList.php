@@ -46,4 +46,8 @@ class ItemList extends \XLiteTest\Framework\Web\Pages\Component{
     public function isProductExist($productId) {
         return $this->isElementPresent(\WebDriverBy::cssSelector("div[class^='product productid-$productId ']"));
     }
+
+    public function productName($productId) {
+        return $this->getComponent()->findElement(\WebDriverBy::cssSelector("div[class^='product productid-$productId ']>h3.product-name>a"));
+    }
 }

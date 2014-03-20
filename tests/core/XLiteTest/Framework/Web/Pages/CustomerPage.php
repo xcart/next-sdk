@@ -11,7 +11,9 @@ namespace XLiteTest\Framework\Web\Pages;
 
 /**
  * Description of Page
- *
+ * 
+ * @property \XLiteTest\Framework\Web\Pages\Customer\Components\MiniCart $componentMiniCart
+ * 
  * @author givi
  */
 class CustomerPage extends \XLiteTest\Framework\Web\Pages\Page{
@@ -85,9 +87,11 @@ class CustomerPage extends \XLiteTest\Framework\Web\Pages\Page{
     }
 
     public function __get($name) {
-            
-        $path = '\\Customer\\Components\\' . substr($name, 9);
+        if (strpos($name, 'component') === 0) {
+            $path = '\\Customer\\Components\\' . substr($name, 9);
     
-        return $this->createComponent($path);
+            return $this->createComponent($path);
+        }
+        return parent::__get($name);
     }
 }
