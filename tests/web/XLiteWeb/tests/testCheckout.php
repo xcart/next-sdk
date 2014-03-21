@@ -62,7 +62,10 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
             $checkout->get_inputLoginPassword->sendKeys($testData['password']);
             $checkout->get_buttonSignIn->click();
         }
-        
+        //Кнопка мигаеет как новогодняя елка... 
+        //пока не вижу нормального способа отследить 
+        //окончание всех обновлений на чекауте
+        sleep(2);
         $checkout->waitForPlaceOrderButton()->click();
         
         $invoice = $this->CustomerInvoice;
@@ -74,6 +77,22 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
         $this->assertTrue($result, $result);
         $this->assertEquals($testData['address']['email'], $invoice->get_textEmail->getText(),'Еmail does not match.');
         
+        $orders = $this->AdminOrders;
+        $orders->load(true);
+        $this->assertTrue($orders->validate(), 'This is not orders page.');
+   
+        $orders->get_inputSearchBy->sendKeys(str_pad($invoiceId, 5, '0', STR_PAD_LEFT));
+        $orders->get_buttonSearch->click();
+        $orderId = $orders->getOrderId();
+        
+        $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
+        $this->assertEquals('Queued', $status, 'Wrong orders staus after palce.');
+        
+        $orders->selectStatus($orderId)->selectByVisibleText('Processed');
+        $orders->SaveChanges();
+        
+        $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
+        $this->assertEquals('Processed', $status, 'Wrong orders staus after processing.');
     }
     
         public function provider()
