@@ -23,6 +23,6 @@ if [ x"${files_list}" = x ]; then
 	files_list='classes';
 fi
 
-standard=`pwd`/$base/sniffs/XLite
+standard=`pwd`/$base/sniffs/XLite/ruleset.xml
 
 /usr/bin/env php $base/phpcs.php -s --report=full --standard=$standard --ignore=upgrade,lib $files_list

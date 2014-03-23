@@ -99,7 +99,10 @@ class XLite_Sniffs_PHP_Formatting_ExpressionsSniff extends XLite_ReqCodesSniff
 		$rp = $tokens[$stackPtr + 1];
 		if ($rp['code'] !== T_WHITESPACE || (substr($rp['content'], 0, 1) !== ' ' && $rp['content'] !== "\n")) {
             $next = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr - 1, null, true);
-			if ($tokens[$next + 1]['code'] !== T_COLON) {
+			if (
+                $tokens[$next + 1]['code'] !== T_COLON
+                && ($tokens[$stackPtr]['code'] !== T_INLINE_THEN && $tokens[$next + 1]['code'] !== T_INLINE_ELSE)
+            ) {
 	            $phpcsFile->addError(
     	            $this->getReqPrefix($rc)
         	        . 'Законченое выражение должно отделяться одним пробелом слева',

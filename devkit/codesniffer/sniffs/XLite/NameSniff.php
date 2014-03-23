@@ -34,7 +34,7 @@ class XLite_NameSniff extends XLite_ReqCodesSniff
      * @see   ____var_see____
      * @since 1.0.24
      */
-    protected $twoWordsAbbrs = array('ECard', 'ECards');
+    protected $twoWordsAbbrs = array('ECard', 'ECards', 'XPath');
 
     /**
      * nouns
@@ -75,6 +75,7 @@ class XLite_NameSniff extends XLite_ReqCodesSniff
         'drop', 'list', 'reverse', 'rand', 'extract', 'wake', 'sleep', 'mkdir', 'unlink', 'copy', 'chmod',
         'complete', 'manage', 'upgrade', 'measure', 'draw', 'replant', 'switch', 'deduct', 'need', 'rollback',
         'wait', 'contains', 'consume', 'fire', 'declare', 'redeclare', 'allow', 'deny', 'authorize', 'setup',
+        'decompress', 'iterate',
 
         // FIXME - rename later
         'processed', 'checked', 'declined', 'queued', 'unchecked', 'checkout', 'display404',
