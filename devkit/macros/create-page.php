@@ -175,7 +175,7 @@ if ($menu) {
 
     $menuShortClass = macro_get_class_short_name($menuClass);
 
-    $menuParent = 'admin' == $interface ? '\\XLiteView\\Menu\\Admin\\TopMenu' : '\\XLite\\View\\Menu\\Customer\\Top';
+    $menuParent = 'admin' == $interface ? '\\XLite\\View\\Menu\\Admin\\TopMenu' : '\\XLite\\View\\Menu\\Customer\\Top';
 
     $string = macro_get_class_repo_header($menuPath)
     . <<<CODE

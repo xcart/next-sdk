@@ -104,7 +104,7 @@ class XLite_Sniffs_PHP_Commenting_FileCommentSniff extends XLite_TagsSniff
 
 
 	// protected $reqCodeRequire = 'REQ.PHP.4.3.4';
-	protected $reqCodePHPVersion = 'REQ.PHP.4.3.3';
+	protected $reqCodePHPVersion = false;
 	protected $reqCodeForbidden = 'REQ.PHP.4.3.9';
 	protected $reqCodeOnlyOne = 'REQ.PHP.4.3.8';
 
@@ -310,8 +310,8 @@ class XLite_Sniffs_PHP_Commenting_FileCommentSniff extends XLite_TagsSniff
     {
         $result = parent::checkCategory($content);
 
-		if ($result[0] && $result[1] != 'LiteCommerce') {
-			$result = array(false, 'LiteCommerce');
+		if ($result[0] && $result[1] != 'X-Cart 5') {
+			$result = array(false, 'X-Cart 5');
 		
 		}
 
