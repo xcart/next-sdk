@@ -48,6 +48,7 @@ if (PHP_SAPI == 'cli') {
     $path      = csv2m_get_named_argument('path');
     $code      = csv2m_get_named_argument('code');
     $delimiter = csv2m_get_named_argument('delimiter') ?: ',';
+    $core      = csv2m_get_named_argument('core') ?: '5.0';
 
     if (empty($author)) {
         print '--author argument is empty!' . PHP_EOL
@@ -113,7 +114,7 @@ if (PHP_SAPI == 'cli') {
 
     $destPath = getcwd() . DIRECTORY_SEPARATOR . 'module.tar';
 
-    $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter);
+    $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter, $core);
     if ($errors) {
         foreach ($errors as $error) {
             print $error . PHP_EOL;
@@ -123,7 +124,9 @@ if (PHP_SAPI == 'cli') {
 
     } else {
 
-        print 'Module .phar-pack: ' . $destPath . PHP_EOL;
+        rename($destPath, $destPath . '.gz');
+
+        print 'Module .phar-pack: ' . $destPath . '.gz' . PHP_EOL;
         print 'Module directory: ' . $destPath . '.directory' . PHP_EOL;
 
         die(0);
@@ -147,7 +150,7 @@ function csv2m_validate_code($string)
     return (bool)preg_match('/^[a-z]{2}$/Ss', $string);
 }
 
-function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ',')
+function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ',', $core = '5.0')
 {
     $errors = array();
 
@@ -386,16 +389,17 @@ PHP;
         $phar->buildFromDirectory($dir);
         $phar->setMetadata(
             array(
-                'RevisionDate' => time(),
-                'ActualName'   => $author . '\\' . $module,
-                'VersionMinor' => '0',
-                'VersionMajor' => '5.0',
-                'Name'         => $module,
-                'Author'       => $author,
-                'IconLink'     => null,
-                'Description'  => $module,
-                'Dependencies' => array(),
-                'isSystem'     => false,
+                'RevisionDate'   => time(),
+                'ActualName'     => $author . '\\' . $module,
+                'VersionMinor'   => '0',
+                'VersionMajor'   => $core,
+                'MinCoreVersion' => $core,
+                'Name'           => $module,
+                'Author'         => $author,
+                'IconLink'       => null,
+                'Description'    => $module,
+                'Dependencies'   => array(),
+                'isSystem'       => false,
             )
         );
 
@@ -461,9 +465,9 @@ function macro_help()
 function csv2m_help()
 {
     return <<<HELP
-Usage: php csv2module.php --path=<path> --author=<author> --code=<language_code> [--module=<module>] [--delimiter=<delimiter>]
+Usage: php csv2module.php --path=<path> --author=<author> --code=<language_code> [--module=<module>] [--delimiter=<delimiter>] [-core=<core major version>]
 
-Example: php csv2module.php --path=example.csv --author=JohnSmith --module=EsTranslation --code=es --delimiter=,
+Example: php csv2module.php --path=example.csv --author=JohnSmith --module=EsTranslation --code=es --delimiter=, --core=5.0
 
 Options:
     --path=<path>
@@ -480,6 +484,9 @@ Options:
 
     --delimiter=<delimiter>
         Column delimiter. Default - ","
+
+    --core=<core major version>
+        X-Cart 5 core major version. Default - 5.0
 
 HELP;
 
