@@ -43,12 +43,13 @@ if (file_exists(__DIR__ . '/core.php') && PHP_SAPI == 'cli') {
 
 // Console runner
 if (PHP_SAPI == 'cli') {
-    $author    = csv2m_get_named_argument('author');
-    $module    = csv2m_get_named_argument('module');
-    $path      = csv2m_get_named_argument('path');
-    $code      = csv2m_get_named_argument('code');
-    $delimiter = csv2m_get_named_argument('delimiter') ?: ',';
-    $core      = csv2m_get_named_argument('core') ?: '5.0';
+    $author     = csv2m_get_named_argument('author');
+    $authorName = csv2m_get_named_argument('authorName') ?: $author;
+    $module     = csv2m_get_named_argument('module');
+    $path       = csv2m_get_named_argument('path');
+    $code       = csv2m_get_named_argument('code');
+    $delimiter  = csv2m_get_named_argument('delimiter') ?: ',';
+    $core       = csv2m_get_named_argument('core') ?: '5.0';
 
     if (empty($author)) {
         print '--author argument is empty!' . PHP_EOL
@@ -114,7 +115,7 @@ if (PHP_SAPI == 'cli') {
 
     $destPath = getcwd() . DIRECTORY_SEPARATOR . 'module.tar';
 
-    $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter, $core);
+    $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter, $core, $authorName);
     if ($errors) {
         foreach ($errors as $error) {
             print $error . PHP_EOL;
@@ -150,8 +151,10 @@ function csv2m_validate_code($string)
     return (bool)preg_match('/^[a-z]{2}$/Ss', $string);
 }
 
-function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ',', $core = '5.0')
+function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ',', $core = '5.0', $authorName = null)
 {
+    $authorName = $authorName ?: $author;
+
     $errors = array();
 
     $dir = $destPath . '.directory';
@@ -255,7 +258,7 @@ abstract class Main extends \XLite\Module\AModule
      */
     public static function getAuthorName()
     {
-        return '$author';
+        return '$authorName';
     }
 
     /**
@@ -275,7 +278,7 @@ abstract class Main extends \XLite\Module\AModule
      */
     public static function getMajorVersion()
     {
-        return '5.0';
+        return '$core';
     }
 
     /**
@@ -395,7 +398,7 @@ PHP;
                 'VersionMajor'   => $core,
                 'MinCoreVersion' => $core,
                 'Name'           => $module,
-                'Author'         => $author,
+                'Author'         => $authorName,
                 'IconLink'       => null,
                 'Description'    => $module,
                 'Dependencies'   => array(),
@@ -473,8 +476,11 @@ Options:
     --path=<path>
         Path to CSV file
 
-    --author=<author>
-        Module author
+    --author=<dev id>
+        Developer ID
+
+    --authorName=<author>
+        Module author name (human readable)
 
     --module=<module>
         Module name. Default - <code>Translation
