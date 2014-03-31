@@ -43,12 +43,14 @@ if (file_exists(__DIR__ . '/core.php') && PHP_SAPI == 'cli') {
 
 // Console runner
 if (PHP_SAPI == 'cli') {
-    $author     = csv2m_get_named_argument('author');
-    $authorName = csv2m_get_named_argument('authorName') ?: $author;
-    $module     = csv2m_get_named_argument('module');
-    $path       = csv2m_get_named_argument('path');
-    $code       = csv2m_get_named_argument('code');
-    $delimiter  = csv2m_get_named_argument('delimiter') ?: ',';
+    $author      = csv2m_get_named_argument('author');
+    $authorName  = csv2m_get_named_argument('authorName') ?: $author;
+    $module      = csv2m_get_named_argument('module');
+    $moduleName  = csv2m_get_named_argument('moduleName') ?: $module;
+    $description = csv2m_get_named_argument('description') ?: $moduleName;
+    $path        = csv2m_get_named_argument('path');
+    $code        = csv2m_get_named_argument('code');
+    $delimiter   = csv2m_get_named_argument('delimiter') ?: ',';
     $core       = csv2m_get_named_argument('core') ?: '5.0';
 
     if (empty($author)) {
@@ -115,7 +117,7 @@ if (PHP_SAPI == 'cli') {
 
     $destPath = getcwd() . DIRECTORY_SEPARATOR . 'module.tar';
 
-    $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter, $core, $authorName);
+    $errors = csv2module($path, $destPath, $author, $module, $code, $delimiter, $core, $authorName, $moduleName, $description);
     if ($errors) {
         foreach ($errors as $error) {
             print $error . PHP_EOL;
@@ -151,9 +153,24 @@ function csv2m_validate_code($string)
     return (bool)preg_match('/^[a-z]{2}$/Ss', $string);
 }
 
-function csv2module($path, &$destPath, $author, $module, $code, $delimiter = ',', $core = '5.0', $authorName = null)
-{
+function csv2module(
+    $path,
+    &$destPath,
+    $author,
+    $module,
+    $code,
+    $delimiter = ',',
+    $core = '5.0',
+    $authorName = null,
+    $moduleName = null,
+    $description = null
+) {
     $authorName = $authorName ?: $author;
+    $moduleName = $moduleName ?: $module;
+    $description = $description ?: $moduleName;
+
+    $moduleNameEscape = addslashes($moduleName);
+    $descriptionEscape = addslashes($description);
 
     $errors = array();
 
@@ -268,7 +285,7 @@ abstract class Main extends \XLite\Module\AModule
      */
     public static function getModuleName()
     {
-        return '$module';
+        return '$moduleNameEscape';
     }
 
     /**
@@ -298,7 +315,7 @@ abstract class Main extends \XLite\Module\AModule
      */
     public static function getDescription()
     {
-        return '$module';
+        return '$descriptionEscape';
     }
 
     /**
@@ -397,10 +414,10 @@ PHP;
                 'VersionMinor'   => '0',
                 'VersionMajor'   => $core,
                 'MinCoreVersion' => $core,
-                'Name'           => $module,
+                'Name'           => $moduleName,
                 'Author'         => $authorName,
                 'IconLink'       => null,
-                'Description'    => $module,
+                'Description'    => $description,
                 'Dependencies'   => array(),
                 'isSystem'       => false,
             )
@@ -483,7 +500,13 @@ Options:
         Module author name (human readable)
 
     --module=<module>
-        Module name. Default - <code>Translation
+        Module service name. Default - <code>Translation
+
+    --moduleName=<module name>
+        Module human readable name. Default - <code>Translation
+
+    --description=<description>
+        Module description. Default - <code>Translation
 
     --code=<language_code>
         2-character language code
