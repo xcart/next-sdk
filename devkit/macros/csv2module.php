@@ -224,7 +224,6 @@ function csv2module(
 
     $data = array(
         'XLite\Model\Language' => array(
-            'directives' => array('addModel' => 'XLite\Model\LanguageTranslation'),
             array(
                 'code'         => $code,
                 'module'       => $author . '\\' . $module,
