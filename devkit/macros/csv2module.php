@@ -222,20 +222,12 @@ function csv2module(
 
     fclose($fp);
 
-    $languages = csv2m_get_languages();
-    $languageNativeName = empty($languages[$code]) ? $code : reset($languages[$code]['native']);
-    $languageIntName = empty($languages[$code]) ? $code : reset($languages[$code]['int']);
-
     $data = array(
         'XLite\Model\Language' => array(
             'directives' => array('addModel' => 'XLite\Model\LanguageTranslation'),
             array(
                 'code'         => $code,
                 'module'       => $author . '\\' . $module,
-                'translations' => array(
-                    array('code' => 'en', 'name' => $languageIntName),
-                    array('code' => $code, 'name' => $languageNativeName),
-                ),
             ),
         ),
         'XLite\Model\LanguageLabel' => array_merge(
