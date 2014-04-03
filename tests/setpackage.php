@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-if ($argc != 2) {
+if ($argc != 3) {
     die('Usage: setpackage <xml file> <package>');
 }
 
