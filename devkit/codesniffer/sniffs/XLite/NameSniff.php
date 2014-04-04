@@ -25,6 +25,7 @@ class XLite_NameSniff extends XLite_ReqCodesSniff
         'HMACMD5', 'HMAC', 'URI', 'ID', 'JS', 'SSL', 'AVS', 'CVV', 'DB', 'HSBC', 'SOAP', 'GMT', 'HTTPS', 'CLI',
         'CMS', 'GC', 'AJAX', 'URLAJAX', 'USPS', 'GD', 'PM', 'XPC', 'DSN', 'EM', 'QB', 'SKU', 'REST', 'FS', 'IREST',
         'YAML', 'GZ', 'HTTP', 'SPL', 'PHAR', 'JSON', 'LC', 'APC', 'VAT', 'IPN', 'ACL', 'XCN', 'SHA512', 'AMQP', 'XC',
+        'QSL',
     );
 
     /**

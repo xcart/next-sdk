@@ -104,7 +104,7 @@ class XLite_Sniffs_PHP_NamingConventions_ValidVariableNameSniff extends XLite_Ab
 		$words = $this->getWordsByCapitalLetter($var);
 
         $fBit = array_shift($words);
-        if (!$this->checkLowWord($fBit)) {
+        if (!$this->checkLowWord($fBit) && !in_array($fBit, $this->abbrs)) {
             $error = "Variable name \"$var\" is not in camel caps format";
             $phpcsFile->addError($this->getReqPrefix('REQ.PHP.1.5.1') . $error, $stackPtr);
 
