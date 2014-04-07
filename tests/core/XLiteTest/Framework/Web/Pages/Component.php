@@ -27,7 +27,7 @@ class Component extends \XLiteTest\Framework\Web\Pages\Page{
     public function getComponent() {
         
         if ($this->findBy == null) {
-            throw new Exception('Error in component declaration. findBy is null.');
+            throw new \Exception('Error in component declaration. findBy is null.');
         }
         if ($this->component == null) {
             $this->component = $this->driver->findElement($this->findBy);

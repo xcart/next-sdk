@@ -128,7 +128,7 @@ class Page {
             }
             $timeout--;
         }
-        throw new Exception('Ajax wait timeout');
+        throw new \Exception('Ajax wait timeout');
     }
     
     public function __get($name) {
@@ -137,7 +137,7 @@ class Page {
             $by = $this->$propertyName;
             return $this->driver->findElement($by);
         }
-        throw new Exception('Unknown property.');
+        throw new \Exception('Unknown property.');
     }
     
     protected function createComponent($path)
