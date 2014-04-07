@@ -94,7 +94,7 @@ abstract class AXLiteWeb extends \XLiteTest\Framework\TestCase
         $driver->manage()->timeouts()->setScriptTimeout($this->getConfig('web_driver', 'scriptTimeout'));
         $driver->manage()->window()->maximize();
         
-        $driver->manage()->window()->setSize((new \WebDriverDimension(1280, 1024));
+        $driver->manage()->window()->setSize(new \WebDriverDimension(1280, 1024));
         
         return $driver;
     }
