@@ -77,7 +77,11 @@ class ResultPrinter extends \PHPUnit_TextUI_ResultPrinter
 
         if ($test instanceof \PHPUnit_Framework_TestCase) {
             $name = lcfirst(preg_replace('/^test/Ss', '', $test->getName()));
-            $this->write("\t\t" . $name . ' ' . str_repeat('.', $this->colNameLength - strlen($name) - 1));
+	    $fillCount =  $this->colNameLength - strlen($name) - 1;
+	    if ($fillCount < 0) {
+		$fillCount = 0;
+	    }
+            $this->write("\t\t" . $name . ' ' . str_repeat('.', $fillCount));
             $this->memoryStart = memory_get_usage();
         }
     }

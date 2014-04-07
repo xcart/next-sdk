@@ -21,7 +21,7 @@ class Invoice extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_textEmail */
-    protected $textEmail = '.bill>p>a';
+    protected $textEmail = '.email>a';
     
     /**
     * 
@@ -42,7 +42,7 @@ class Invoice extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     
     public function checkAddresses($data) {
         $output = '';
-        $sections = array('ship','bill');
+        $sections = array('shipping','payment');
         foreach ($sections as $section) {
             foreach ($data as $field => $value){
                 $by = \WebDriverBy::cssSelector("td.${section} li.address-$field>span.address-field"); 
