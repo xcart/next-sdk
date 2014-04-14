@@ -90,7 +90,7 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
         
         $orders->selectStatus($orderId)->selectByVisibleText('Paid');
         $orders->SaveChanges();
-        
+        sleep(2);
         $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
         $this->assertEquals('Paid', $status, 'Wrong orders staus after processing.');
     }
