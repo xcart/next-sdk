@@ -27,6 +27,10 @@ class Orders extends \XLiteTest\Framework\Web\Pages\AdminPage {
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_firstLastRow */
     protected $firstLastRow = 'tr.first.last';
+    
+    /** @findBy 'cssSelector' @var \WebDriverBy 
+    * @property \RemoteWebElement $get_buttonSaveChanges */
+    protected $buttonSaveChanges = 'button.regular-main-button.action.submit';
      /**
     * 
     * @return boolean

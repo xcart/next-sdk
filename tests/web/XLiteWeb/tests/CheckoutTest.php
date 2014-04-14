@@ -84,14 +84,13 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
         $orders->get_inputSearchBy->sendKeys(str_pad($invoiceId, 5, '0', STR_PAD_LEFT));
         $orders->get_buttonSearch->click();
         $orderId = $orders->getOrderId();
-        
+   
         $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
         $this->assertEquals('Awaiting payment', $status, 'Wrong orders staus after palce.');
         
         $orders->selectStatus($orderId)->selectByVisibleText('Paid');
-        sleep(2);
-        $orders->SaveChanges();
-
+        $orders->get_buttonSaveChanges->click();
+   
         $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
         $this->assertEquals('Paid', $status, 'Wrong orders staus after processing.');
     }
