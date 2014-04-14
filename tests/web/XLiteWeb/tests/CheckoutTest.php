@@ -89,8 +89,9 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
         $this->assertEquals('Awaiting payment', $status, 'Wrong orders staus after palce.');
         
         $orders->selectStatus($orderId)->selectByVisibleText('Paid');
-        $orders->SaveChanges();
         sleep(2);
+        $orders->SaveChanges();
+
         $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
         $this->assertEquals('Paid', $status, 'Wrong orders staus after processing.');
     }
@@ -140,6 +141,7 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
             )
         ));
         //for debug
+        //return $datasets;
         //$datasets = array();
         $datasets['Registred'] = array(
             array(
