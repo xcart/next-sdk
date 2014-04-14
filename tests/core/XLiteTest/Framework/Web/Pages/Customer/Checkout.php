@@ -36,7 +36,7 @@ class Checkout extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_buttonPlaceOrder */
-    protected $buttonPlaceOrderActive = "button[class='bright place-order']";
+    protected $buttonPlaceOrderActive = "button[class*='bright place-order']";
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_inputLoginEmail */

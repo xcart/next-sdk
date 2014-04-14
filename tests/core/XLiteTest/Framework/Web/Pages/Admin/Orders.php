@@ -72,7 +72,7 @@ class Orders extends \XLiteTest\Framework\Web\Pages\AdminPage {
      * @return \WebDriverSelect
      */
     public function selectStatus($orderId) {
-        $element = $this->driver->findElement(\WebDriverBy::cssSelector("#data-${orderId}-status"));
+        $element = $this->driver->findElement(\WebDriverBy::cssSelector("#data-${orderId}-paymentstatus"));
         return new \WebDriverSelect($element);
     }
     

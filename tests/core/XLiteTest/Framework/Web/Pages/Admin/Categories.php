@@ -29,7 +29,7 @@ class Categories extends \XLiteTest\Framework\Web\Pages\AdminPage{
      * @findBy 'cssSelector'
      * @var \WebDriverBy
      */
-    protected $lastCategoryName = "tr[class^='line last']>td[class='cell name main'] span[class='value']";
+    protected $lastCategoryName = "tr[class^='line last']>td[class^='cell name main'] span[class='value']";
     
     /**
      * @findBy 'cssSelector'

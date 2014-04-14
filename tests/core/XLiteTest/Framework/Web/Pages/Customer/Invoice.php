@@ -42,10 +42,10 @@ class Invoice extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     
     public function checkAddresses($data) {
         $output = '';
-        $sections = array('shipping','payment');
+        $sections = array('shipping','billing');
         foreach ($sections as $section) {
             foreach ($data as $field => $value){
-                $by = \WebDriverBy::cssSelector("td.${section} li.address-$field>span.address-field"); 
+                $by = \WebDriverBy::cssSelector("ul.address-section.${section}-address-section>li.address-$field>span.address-field"); 
                 $text = $this->driver->findElement($by)->getText();
                 if ($text != $value) {
                     $output .= "\nField '$field' does not match. expected($value) given($text)\n";

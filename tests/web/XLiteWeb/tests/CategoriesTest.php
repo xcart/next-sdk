@@ -88,7 +88,7 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
                 'availInStorefront'=>true,
             )
         ));
-        
+
         $datasets['Disabled category'] = array(
             array(
             'config'=>array(),

@@ -2,7 +2,8 @@
     "require-dev": {
         "facebook/webdriver": "dev-master",
         "symfony/yaml": "2.5.*@dev",
-	"phpunit/phpunit": "*"
+	"phpunit/phpunit": "*",
+	"aws/aws-sdk-php": "2.6.0"
     },
 
     "autoload": {

@@ -53,28 +53,28 @@ class testProducts  extends \XLiteWeb\AXLiteWeb {
             array(
             'config'=>array(),
             'testData'=>array(
-                'product-name'     => 'Test product',
-                'posteddata-brief-description'    => 'Test product <b>brief</b> description.',
-                'posteddata-description'     => 'Descrip<b>t</b><i>i</i>on',
-                'product-price'    => '123.45',
+                'name'     => 'Test product',
+                'brief-description'    => 'Test product <b>brief</b> description.',
+                'description'     => 'Descrip<b>t</b><i>i</i>on',
+                'price'    => '123.45',
                 'weight'   => '12',
-                'enabled'  => 'Yes',
+                'enabled'  => 'Y',
             ),
             'results'=>array(
                 'availInStorefront'=>true,
             )
         ));
-        
+
         $datasets['Disabled product'] = array(
             array(
             'config'=>array(),
             'testData'=>array(
-                'product-name'     => 'Test product 2',
-                'posteddata-brief-description'    => 'Test product 2 <b>brief</b> description.',
-                'posteddata-description'     => 'Descrip<b>t</b><i>i</i>on',
-                'product-price'    => '0',
+                'name'     => 'Test product 2',
+                'brief-description'    => 'Test product 2 <b>brief</b> description.',
+                'description'     => 'Descrip<b>t</b><i>i</i>on',
+                'price'    => '0',
                 'weight'   => '1',
-                'enabled'  => 'No',
+                'enabled'  => 'N',
             ),
             'results'=>array(
                 'availInStorefront'=>false,

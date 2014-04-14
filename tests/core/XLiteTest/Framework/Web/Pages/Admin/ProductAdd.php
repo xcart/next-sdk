@@ -18,7 +18,7 @@ class ProductAdd extends \XLiteTest\Framework\Web\Pages\AdminPage{
      * @findBy 'cssSelector'
      * @var \WebDriverBy
      */
-    protected $hiddenProductId = ".product-modify-form>fieldset>input[name='product_id']";
+    protected $hiddenProductId = "form.product>fieldset>input[name='product_id']";
     
     /**
      * @findBy 'cssSelector'
@@ -30,37 +30,13 @@ class ProductAdd extends \XLiteTest\Framework\Web\Pages\AdminPage{
      * @findBy 'cssSelector'
      * @var \WebDriverBy
      */
-    protected $addPoduct = ".model-button.orange";
+    protected $addPoduct = "button.action.submit";
     
     /**
      * @findBy 'cssSelector'
      * @var \WebDriverBy
      */
-    protected $inputCategory = "#posteddata-category-ids";
-    
-    /**
-     * @findBy 'cssSelector'
-     * @var \WebDriverBy
-     */
-    protected $inputWeight = ".value-attribute>input[name='postedData[weight]']";
-    
-    /**
-     * @findBy 'cssSelector'
-     * @var \WebDriverBy
-     */
-    protected $inputEnabled = "select[name='postedData[enabled]']";
-    
-    
-    public function inputEnabled($value) {
-        $enabled = new \WebDriverSelect($this->driver->findElement($this->inputEnabled));
-        $enabled->selectByVisibleText($value);
-        return $this;
-    }
-    
-    
-    public function inputWeight($value) {
-        return $this->driver->findElement($this->inputWeight)->sendKeys($value);
-    }
+    protected $inputCategory = "#categories";
     
     /**
     * 

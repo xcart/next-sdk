@@ -86,13 +86,13 @@ class testCheckout extends \XLiteWeb\AXLiteWeb{
         $orderId = $orders->getOrderId();
         
         $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
-        $this->assertEquals('Queued', $status, 'Wrong orders staus after palce.');
+        $this->assertEquals('Awaiting payment', $status, 'Wrong orders staus after palce.');
         
-        $orders->selectStatus($orderId)->selectByVisibleText('Processed');
+        $orders->selectStatus($orderId)->selectByVisibleText('Paid');
         $orders->SaveChanges();
         
         $status = $orders->selectStatus($orderId)->getFirstSelectedOption()->getText();
-        $this->assertEquals('Processed', $status, 'Wrong orders staus after processing.');
+        $this->assertEquals('Paid', $status, 'Wrong orders staus after processing.');
     }
     
         public function provider()
