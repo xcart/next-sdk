@@ -139,6 +139,12 @@ class XLite_Sniffs_PHP_NamingConventions_UpperCaseConstantNameSniff extends XLit
                 return;
             }
 
+            // Is this a class alias?
+            $prevPtr = $phpcsFile->findPrevious(array(T_WHITESPACE), ($stackPtr - 1), null, true);
+            if ($tokens[$prevPtr]['code'] === T_AS) {
+                return;
+            }
+
             // Is this a type hint?
             if ($tokens[$nextPtr]['code'] === T_VARIABLE || $phpcsFile->isReference($nextPtr) === true) {
                 return;
