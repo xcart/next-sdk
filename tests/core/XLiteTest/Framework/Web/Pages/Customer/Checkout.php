@@ -16,11 +16,11 @@ namespace XLiteTest\Framework\Web\Pages\Customer;
 class Checkout extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_buttonSignIn */
-    protected $buttonSignIn = 'td.sign-in-button>.action';
+    protected $buttonSignIn = 'td.sign-in-button>button.submit';
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_buttonSignInAnonymous */
-    protected $buttonSignInAnonymous = 'div.signin-anonymous-box>.action';
+    protected $buttonSignInAnonymous = 'div.signin-anonymous-box>button';
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_checkCreateProfile */
@@ -36,7 +36,7 @@ class Checkout extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_buttonPlaceOrder */
-    protected $buttonPlaceOrderActive = "button[class*='bright place-order']";
+    protected $buttonPlaceOrder = "button.place-order.submit";
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_inputLoginEmail */
@@ -75,8 +75,8 @@ class Checkout extends \XLiteTest\Framework\Web\Pages\CustomerPage {
      * @return \RemoteWebElement
      */
     public function waitForPlaceOrderButton() {
-        $cond = \WebDriverExpectedCondition::elementToBeClickable($this->buttonPlaceOrderActive);
+        $cond = \WebDriverExpectedCondition::elementToBeClickable($this->buttonPlaceOrder);
         $this->driver->wait(30)->until($cond);
-        return $this->driver->findElement($this->buttonPlaceOrderActive);
+        return $this->driver->findElement($this->buttonPlaceOrder);
     }
 }

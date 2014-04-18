@@ -23,7 +23,7 @@ class MiniCart extends \XLiteTest\Framework\Web\Pages\Component{
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_buttonCheckout */
-    protected $buttonCheckout = '.bright.checkout';
+    protected $buttonCheckout = 'button.checkout';
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_textItemCount */

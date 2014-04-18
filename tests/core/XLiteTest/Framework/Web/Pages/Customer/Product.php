@@ -19,7 +19,7 @@ class Product extends \XLiteTest\Framework\Web\Pages\CustomerPage {
     protected $form = "form.product-details";
     /** @findBy 'cssSelector' @var \WebDriverBy 
      * @property \RemoteWebElement $get_buttonAddToCart */
-    protected $buttonAddToCart = "button.bright.add2cart";
+    protected $buttonAddToCart = "button.add2cart.submit";
      
     public function validate() {
         return $this->isElementPresent($this->form);
