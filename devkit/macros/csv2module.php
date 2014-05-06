@@ -419,7 +419,7 @@ PHP;
                 'ActualName'     => $author . '\\' . $module,
                 'VersionMinor'   => '0',
                 'VersionMajor'   => $core,
-                'MinCoreVersion' => $core,
+                'MinCoreVersion' => '0',
                 'Name'           => $moduleName,
                 'Author'         => $authorName,
                 'IconLink'       => null,
