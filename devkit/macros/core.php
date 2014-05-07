@@ -29,29 +29,31 @@ if (PHP_SAPI != 'cli') {
     macro_error('Server API must be CLI!');
 }
 
-$dir = MACRO_START_DIR;
-do {
-	if (file_exists($dir . DIRECTORY_SEPARATOR . 'top.inc.php')) {
-		define('XCN_MACROS_ROOT', $dir);
-		break;
+if (!defined('MACRO_NO_XCN_CORE')) {
+    $dir = MACRO_START_DIR;
+    do {
+	    if (file_exists($dir . DIRECTORY_SEPARATOR . 'top.inc.php')) {
+		    define('XCN_MACROS_ROOT', $dir);
+    		break;
 
-    } elseif (file_exists($dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'top.inc.php')) {
-        define('XCN_MACROS_ROOT', $dir . DIRECTORY_SEPARATOR . 'src');
-        break;
+        } elseif (file_exists($dir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'top.inc.php')) {
+            define('XCN_MACROS_ROOT', $dir . DIRECTORY_SEPARATOR . 'src');
+            break;
 
-	} else {
-		$tmp = realpath($dir . DIRECTORY_SEPARATOR . '..');
-		$dir = $tmp == $dir ? null : $tmp;
-	}
+	    } else {
+    		$tmp = realpath($dir . DIRECTORY_SEPARATOR . '..');
+	    	$dir = $tmp == $dir ? null : $tmp;
+    	}
 
-} while ($dir);
+    } while ($dir);
 
-if (!defined('XCN_MACROS_ROOT')) {
-	print 'top.inc.php not found!' . PHP_EOL;
-	die(1);
+    if (!defined('XCN_MACROS_ROOT')) {
+	    print 'top.inc.php not found!' . PHP_EOL;
+    	die(1);
+    }
+
+    require_once XCN_MACROS_ROOT . DIRECTORY_SEPARATOR . 'top.inc.php';
 }
-
-require_once XCN_MACROS_ROOT . DIRECTORY_SEPARATOR . 'top.inc.php';
 
 array_shift($_SERVER['argv']);
 
