@@ -1,0 +1,3 @@
+login,added,firstLogin,lastLogin,status,referer,language,shippingAddress,billingAddress,membership,firstnameAddressField,lastnameAddressField,streetAddressField,cityAddressField,countryCodeAddressField,stateAddressField,zipcodeAddressField,phoneAddressField
+rnd_tester@rrf.ru,,,,E,,,No,Yes,,Guest,Guest,"51 apt, 87 street",Edmond,US,Oklahoma,73003,0123456789
+,,,,,,,,,,Guest,Guest,"12 apt, 34 street","New York",US,Oklahoma,10001,9876543210

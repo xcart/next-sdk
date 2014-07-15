@@ -22,11 +22,11 @@ class testProducts  extends \XLiteWeb\AXLiteWeb {
         $addProduct = $this->AdminProductAdd;
         $addProduct->load(true);
         $this->assertTrue($addProduct->validate(), 'Error validating add product page.');
-        $categoryName = $addProduct->selectRandomCategory();
         $addProduct->fillForm($dataset['testData']);
         $addProduct->addProduct();
         
         $productId= $addProduct->getProductId();
+        $categoryName = $addProduct->getCategory($dataset['testData']['categories']);
         
         $storeFront = $this->CustomerIndex;
         $storeFront->load();
@@ -48,6 +48,7 @@ class testProducts  extends \XLiteWeb\AXLiteWeb {
     
     public function provider()
     {
+        // Categories are hardcoded by 'value'
         $datasets = array();
         $datasets['Usual product'] = array(
             array(
@@ -59,6 +60,7 @@ class testProducts  extends \XLiteWeb\AXLiteWeb {
                 'price'    => '123.45',
                 'weight'   => '12',
                 'enabled'  => 'Y',
+                'categories'=> '2'
             ),
             'results'=>array(
                 'availInStorefront'=>true,
@@ -75,6 +77,7 @@ class testProducts  extends \XLiteWeb\AXLiteWeb {
                 'price'    => '0',
                 'weight'   => '1',
                 'enabled'  => 'N',
+                'categories'=> '2'
             ),
             'results'=>array(
                 'availInStorefront'=>false,

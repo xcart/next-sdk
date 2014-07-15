@@ -78,12 +78,20 @@ class ProductAdd extends \XLiteTest\Framework\Web\Pages\AdminPage{
         
         do {
             $option = $options[array_rand($options)];
-        } while(preg_match('/^-/', $option->getText()));
+        } while(preg_match('/^-|Test/', $option->getText()));
         
         $option->click();
         return $option->getText();
     }
     
+    public function getCategory($value) {
+        $text = '';
+        $categories = new \WebDriverSelect($this->driver->findElement($this->inputCategory));
+        $selected = $categories->getAllSelectedOptions();
+        $text = $selected[0]->getText();
+        return $text;
+    }
+
     public function getProductId() {
         return $this->driver->findElement($this->hiddenProductId)->getAttribute('value');
     }

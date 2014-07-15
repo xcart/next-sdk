@@ -15,7 +15,7 @@ namespace XLiteTest\Framework\Web\Pages\Customer\Components;
  */
 class MiniCart extends \XLiteTest\Framework\Web\Pages\Component{
     /** @findBy 'cssSelector' @var \WebDriverBy */
-    protected $findBy = '#lc-minicart-horizontal';
+    protected $findBy = '.lc-minicart';
     
     /** @findBy 'cssSelector' @var \WebDriverBy 
     * @property \RemoteWebElement $get_buttonCart */

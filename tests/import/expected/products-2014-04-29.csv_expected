@@ -1,0 +1,19 @@
+Array
+(
+        (
+            [type:protected] => E
+            [code:protected] => PRODUCT-SKU-FMT
+            [arguments:protected] => Array
+                (
+                    [column] => sku
+                    [value] => 
+                    [header] => sku
+                )
+
+            [file:protected] => products-2014-04-29.csv
+            [row:protected] => 2
+            [processor:protected] => XLite\Logic\Import\Processor\Products
+        )
+
+)
+END

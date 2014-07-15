@@ -30,6 +30,18 @@ class Categories extends \XLiteTest\Framework\Web\Pages\AdminPage{
      * @var \WebDriverBy
      */
     protected $lastCategoryName = "tr[class^='line last']>td[class^='cell name main'] span[class='value']";
+
+    /**
+     * @findBy 'cssSelector'
+     * @var \WebDriverBy
+     */
+    protected $listFirstLine = "tr[class^='line first']";
+
+    /**
+     * @findBy 'cssSelector'
+     * @var \WebDriverBy
+     */
+    protected $firstCategoryName = "tr[class^='line first']>td[class^='cell name main'] span[class='value']";
     
     /**
      * @findBy 'cssSelector'
@@ -76,13 +88,19 @@ class Categories extends \XLiteTest\Framework\Web\Pages\AdminPage{
     }
     
     public function getLastAddedCategoryId() {
-        $data = $this->driver->findElement($this->listLastLine)->getAttribute('class');
+        $data = $this->driver->findElement($this->listFirstLine)->getAttribute('class');
         $matches = array();
         preg_match('/entity-([0-9]+)/', $data, $matches);
         if (isset($matches[1])) {
             return $matches[1];
         }
         return false;
+    }
+
+    public function getFirstCategoryName() {
+        $condition = \WebDriverExpectedCondition::presenceOfElementLocated($this->firstCategoryName);
+        $this->driver->wait(10)->until($condition, 'Time out.');
+        return $this->driver->findElement($this->firstCategoryName)->getText();
     }
 
     public function editCategory($categoryId)

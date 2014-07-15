@@ -2,7 +2,7 @@
     "require-dev": {
         "facebook/webdriver": "dev-master",
         "symfony/yaml": "2.5.*@dev",
-	"phpunit/phpunit": "*",
+	"phpunit/phpunit": "4.1.0",
 	"aws/aws-sdk-php": "2.6.0"
     },
 
@@ -10,7 +10,8 @@
         "psr-0": {
             "XLiteTest": "core/",
             "XLiteUnit": "unit/",
-            "XLiteWeb": "web/"
+            "XLiteWeb": "web/",
+            "XLiteIntegration": "integration/"
         }
     }
 }

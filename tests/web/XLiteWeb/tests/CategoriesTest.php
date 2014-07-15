@@ -28,7 +28,7 @@ class testCategories extends \XLiteWeb\AXLiteWeb{
         $categories->SaveChanges();
         
         $this->assertEquals($dataset['testData']['name'],
-                $categories->getLastCategoryName(),
+                $categories->getFirstCategoryName(),
                 'Category name does not match');
         
         $categoryId = $categories->getLastAddedCategoryId();

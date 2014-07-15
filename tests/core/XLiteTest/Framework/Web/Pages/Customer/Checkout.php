@@ -75,8 +75,9 @@ class Checkout extends \XLiteTest\Framework\Web\Pages\CustomerPage {
      * @return \RemoteWebElement
      */
     public function waitForPlaceOrderButton() {
-        $cond = \WebDriverExpectedCondition::elementToBeClickable($this->buttonPlaceOrder);
-        $this->driver->wait(30)->until($cond);
+        $cond = $this->elementClassNotDisabled($this->buttonPlaceOrder);
+        $msg = sprintf('elementClassNotDisabled did not return "true".');
+        $this->driver->wait(30)->until($cond, $msg);
         return $this->driver->findElement($this->buttonPlaceOrder);
     }
 }

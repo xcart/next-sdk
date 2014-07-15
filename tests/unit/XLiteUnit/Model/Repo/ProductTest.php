@@ -448,16 +448,12 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
         $result = $repo->findAllCleanURLs();
 
         $this->assertInternalType('array', $result, 'Result is not array');
+        $this->assertNotEmpty($result);
 
-        if (empty($result)) {
-            $this->markTestSkipped('Result is empty array');
-
-        } else {
-            foreach ($result as $key => $value) {
-                $this->assertInternalType('string', $key, 'Clean URL is not string');
-                $this->assertInternalType('int', $value, 'Product ID is not integer');
-                $this->assertNotEmpty($key, 'Clean URL is empty');
-            }
+        foreach ($result as $key => $value) {
+            $this->assertInternalType('string', $key, 'Clean URL is not string');
+            $this->assertInternalType('int', $value, 'Product ID is not integer');
+            $this->assertNotEmpty($key, 'Clean URL is empty');
         }
 	}
 
@@ -521,19 +517,16 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
         $repo = $this->getRepo();
 
         $cleanURLs = $repo->findAllCleanURLs();
+        $this->assertNotEmpty($cleanURLs);
 
-        if (!empty($cleanURLs)) {
-            foreach ($cleanURLs as $url => $productId) {
-                $this->assertNotEmpty($url, 'Clean URL is empty');
-                $product = $repo->findOneByCleanURL($url);
-                $this->assertInstanceOf('\XLite\Model\Product', $product, sprintf('Result is not \XLite\Model\Product instance (clean URL = "%s")', $url));
-                $this->assertEquals($productId, $product->getProductId(), sprintf('Result product ID (%s) differs from expected product ID (%s)', $product->getProductId(), $productId));
-                break; // Make one iteration only
-            }
-
-        } else {
-            $this->markTestSkipped('There are no clean URLS specified for products');
+        foreach ($cleanURLs as $url => $productId) {
+            $this->assertNotEmpty($url, 'Clean URL is empty');
+            $product = $repo->findOneByCleanURL($url);
+            $this->assertInstanceOf('\XLite\Model\Product', $product, sprintf('Result is not \XLite\Model\Product instance (clean URL = "%s")', $url));
+            $this->assertEquals($productId, $product->getProductId(), sprintf('Result product ID (%s) differs from expected product ID (%s)', $product->getProductId(), $productId));
+            break; // Make one iteration only
         }
+
     }
 
     /**
@@ -810,38 +803,33 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
         $product = $this->getProduct();
         $categories = $product->getCategories();
 
-        if (empty($categories)) {
-            $this->markTestSkipped('There are no categories of test product');
 
-        } else {
+        $catId = $categories[0]->getCategoryId();
 
-            $catId = $categories[0]->getCategoryId();
+        $cnd = $this->getSearchConditions();
 
-            $cnd = $this->getSearchConditions();
+        // Pass category ID
+        $cnd->{\XLite\Model\Repo\Product::P_CATEGORY_ID} = $catId;
 
-            // Pass category ID
-            $cnd->{\XLite\Model\Repo\Product::P_CATEGORY_ID} = $catId;
+        $result = $repo->search($cnd);
 
-            $result = $repo->search($cnd);
+        $this->assertInternalType('array', $result, sprintf('Result is not array (category: %d)', $catId));
 
-            $this->assertInternalType('array', $result, sprintf('Result is not array (category: %d)', $catId));
+        foreach ($result as $r) {
+            $rCategories = \Includes\Utils\ArrayManager::getObjectsArrayFieldValues($r->getCategories(), 'category_id', false);
+            $this->assertContains($catId, $rCategories, sprintf('Found product (id: %d) does not belong the category (category: %d)', $r->getProductId(), $catId));
+        }
 
-            foreach ($result as $r) {
-                $rCategories = \Includes\Utils\ArrayManager::getObjectsArrayFieldValues($r->getCategories(), 'category_id', false);
-                $this->assertContains($catId, $rCategories, sprintf('Found product (id: %d) does not belong the category (category: %d)', $r->getProductId(), $catId));
-            }
+        // Pass category object
+        $cnd->{\XLite\Model\Repo\Product::P_CATEGORY_ID} = $categories[0];
 
-            // Pass category object
-            $cnd->{\XLite\Model\Repo\Product::P_CATEGORY_ID} = $categories[0];
+        $result = $repo->search($cnd);
 
-            $result = $repo->search($cnd);
+        $this->assertInternalType('array', $result, sprintf('Result is not array (category: %d)', $catId));
 
-            $this->assertInternalType('array', $result, sprintf('Result is not array (category: %d)', $catId));
-
-            foreach ($result as $r) {
-                $rCategories = \Includes\Utils\ArrayManager::getObjectsArrayFieldValues($r->getCategories(), 'category_id', false);
-                $this->assertContains($catId, $rCategories, sprintf('Found product (id: %d) does not belong the category (category: %d)', $r->getProductId(), $catId));
-            }
+        foreach ($result as $r) {
+            $rCategories = \Includes\Utils\ArrayManager::getObjectsArrayFieldValues($r->getCategories(), 'category_id', false);
+            $this->assertContains($catId, $rCategories, sprintf('Found product (id: %d) does not belong the category (category: %d)', $r->getProductId(), $catId));
         }
     }
 
@@ -891,15 +879,11 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
 
         $this->assertInternalType('array', $result, 'Result is not array');
 
-        if (!empty($result)) {
-            foreach ($result as $r) {
-                $price = $r->getPrice();
-                $this->assertTrue($price >= $min && $price <= $max, sprintf('Found product with price out of range (%f)', $price));
-            }
-
-        } else {
-            $this->markTestSkipped(sprintf('There are no products in specified price range (%f - %f)', $min, $max));
+        foreach ($result as $r) {
+            $price = $r->getPrice();
+            $this->assertTrue($price >= $min && $price <= $max, sprintf('Found product with price out of range (%f)', $price));
         }
+
     }
 
     /**
@@ -919,14 +903,10 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
 
         $this->assertInternalType('array', $result, 'Result is not array');
 
-        if (!empty($result)) {
-            foreach ($result as $r) {
-                $this->assertNotContains($r->getProductId(), is_array($data) ? $data : array($data), 'Found excluded product');
-            }
-
-        } else {
-            $this->markTestSkipped('There are no products for specified input data set');
+        foreach ($result as $r) {
+            $this->assertNotContains($r->getProductId(), is_array($data) ? $data : array($data), 'Found excluded product');
         }
+
     }
 
     /**
@@ -961,47 +941,43 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
 
         $this->assertInternalType('array', $result, 'Result is not array');
 
-        if (!empty($result)) {
 
-            if ($status != \XLite\Model\Repo\Product::INV_ALL) {
+        if ($status != \XLite\Model\Repo\Product::INV_ALL) {
 
-                foreach ($result as $r) {
+            foreach ($result as $r) {
 
-                    $inv = $r->getInventory();
+               $inv = $r->getInventory();
 
-                    if (!$inv->getEnabled()) {
-                        continue;
-                    }
+                if (!$inv->getEnabled()) {
+                    continue;
+                }
 
-                    $lowEnabled = $inv->getLowLimitEnabled();
-                    $amount = $inv->getAmount();
-                    $low = $inv->getLowLimitAmount();
+                $lowEnabled = $inv->getLowLimitEnabled();
+                $amount = $inv->getAmount();
+                $low = $inv->getLowLimitAmount();
                 
-                    switch ($status) {
+                switch ($status) {
         
-                        case \XLite\Model\Repo\Product::INV_LOW: {
-                            $this->assertTrue($lowEnabled && $amount <= $low, 'Low limit products checking');
-                            break;
-                        }
-
-                        case \XLite\Model\Repo\Product::INV_OUT: {
-                            $this->assertTrue(0 >= $amount, 'Out of stock products checking');
-                            break;
-                        }
-
-                        case \XLite\Model\Repo\Product::INV_IN: {
-                            $this->assertTrue(0 <= $amount, 'In stock products checking');
-                            break;
-                        }
-
-                        default:
+                    case \XLite\Model\Repo\Product::INV_LOW: {
+                        $this->assertTrue($lowEnabled && $amount <= $low, 'Low limit products checking');
+                        break;
                     }
+
+                    case \XLite\Model\Repo\Product::INV_OUT: {
+                        $this->assertTrue(0 >= $amount, 'Out of stock products checking');
+                        break;
+                    }
+
+                    case \XLite\Model\Repo\Product::INV_IN: {
+                        $this->assertTrue(0 <= $amount, 'In stock products checking');
+                        break;
+                    }
+
+                    default:
                 }
             }
-        
-        } else {
-            $this->markTestSkipped('There are no products for specified input data set');
         }
+        
     }
 
     /**
@@ -1036,9 +1012,6 @@ class ProductTest extends \XLiteUnit\Model\Repo\ARepo
     {
         $products = $this->getRepo()->findAll();
 
-        if (empty($products)) {
-            $this->markTestSkipped('There are no products found');
-        }
 
         return $products[0];
     }

@@ -1,0 +1,9 @@
+path,enabled,showTitle,position,memberships,image,cleanURL,name_en,description_en,metaTags_en,metaDesc_en,metaTitle_en
+,Yes,No,0,,,,Catalog,"<div style=""margin: 0 0 1em;""><img src=""public/store-index-banner.png"" alt="""" /></div> <p style=""text-align: justify;"">This demo online store is powered by X-Cart 5 shopping cart software. With X-Cart 5 you can setup a web store having all of the features this demo has.</p> <p style=""text-align: justify;""><strong>This service is for demo purposes only.</strong> No real products. No real prices. No real charges. This is a demonstration. Please do not submit real credit card information.</p>",,,
+iGoods,Yes,No,0,,http://example.com/next/src/images/category/demo_store_c4005.jpg,igoods,iGoods,"<img src=""public/igoods.png"" alt=""""/>",,,
+Apparel,Yes,No,0,,http://example.com/next/src/images/category/demo_store_c1002.jpeg,apparel,Apparel,"<img src=""public/apparel.png"" alt=""""/>",,,
+Toys,Yes,No,0,,http://example.com/next/src/images/category/demo_store_c1004.jpeg,toys,Toys,"<img src=""public/toys.png"" alt=""""/>",,,
+"Toys >>> Cube Goodies",Yes,Yes,0,,http://example.com/next/src/images/category/demo_store_c1003.jpeg,cube-goodies,"Cube Goodies",Category-child,,,
+"Toys >>> RC Toys",Yes,Yes,0,,http://example.com/next/src/images/category/demo_store_c4002.jpeg,rc-toys,"RC Toys",,,,
+"Toys >>> Science Toys",Yes,Yes,0,,http://example.com/next/src/images/category/demo_store_c4003.jpeg,science-toys,"Science Toys",,,,
+"Toys >>> Puzzles",Yes,Yes,0,,http://example.com/next/src/images/category/demo_store_c4004.jpeg,puzzles,Puzzles,,,,

@@ -84,6 +84,11 @@ class Page {
         
     }
     
+    public function takeScreenshot() {
+        $file = "./" . date('h-i-s', time()) . "-" . time() . ".png";
+        $this->driver->takeScreenshot($file);
+    }
+
     public function getErrorText() {
         if ($this->isErrorOnPage()) {
             return $this->driver->findElement($this->errorMessage)->getText();
@@ -111,6 +116,21 @@ class Page {
         }
     }
     
+    public function elementClassNotDisabled(\WebDriverBy $by, \RemoteWebElement $element = null) {
+        return function($driver) use ($by) {
+            try {
+                $el = $driver->findElement($by);
+            } catch (\WebDriverException $e) {
+                return null;
+            }
+            if(strpos($el->getAttribute('class'), 'disabled') == FALSE) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+    }
+
     public function waitForAjax($timeout=30 ,\WebDriverBy $element = null) {
         if ($element == null) {
             $element = \WebDriverBy::cssSelector('div.block-wait');

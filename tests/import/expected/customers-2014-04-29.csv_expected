@@ -1,0 +1,19 @@
+Array
+(
+        (
+            [type:protected] => E
+            [code:protected] => USER-LOGIN-FMT
+            [arguments:protected] => Array
+                (
+                    [column] => login
+                    [value] => 
+                    [header] => login
+                )
+
+            [file:protected] => customers-2014-04-29.csv
+            [row:protected] => 3
+            [processor:protected] => XLite\Logic\Import\Processor\Customers
+        )
+
+)
+END
