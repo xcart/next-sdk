@@ -226,8 +226,20 @@ function macro_convert_camel_to_human_readable($camel)
 {
     $camel = str_replace('_', ' ', $camel);
     $camel = str_replace('\\', ' ', $camel);
-    $camel = preg_replace('/ ([A-Z])([a-z0-9])/Sse', '\' \' . strtolower(\'\1\') . \'\2\'', $camel);
-    $camel = preg_replace('/([a-z0-9])([A-Z])([a-z0-9])/Sse', '\'\1 \' . strtolower(\'\2\') . \'\3\'', $camel);
+    $camel = preg_replace_callback(
+        '/ ([A-Z])([a-z0-9])/Ss',
+        function (array $matches) {
+            return ' ' . strtolower($matches[1]) . $matches[2];
+        },
+        $camel
+    );
+    $camel = preg_replace_callback(
+        '/([a-z0-9])([A-Z])([a-z0-9])/Ss',
+        function (array $matches) {
+            return $matches[1] . ' ' . strtolower($matches[2]) . $matches[3];
+        },
+        $camel
+    );
 
     return ucfirst($camel);
 }
@@ -364,7 +376,7 @@ function macro_get_file_header($path)
  *
  * @category  X-Cart 5
  * @author    Qualiteam software Ltd <info@x-cart.com>
- * @copyright Copyright (c) 2011-2013 Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @copyright Copyright (c) 2011-2014 Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license   http://www.x-cart.com/license-agreement.html X-Cart 5 License Agreement
  * @link      http://www.x-cart.com/
  */

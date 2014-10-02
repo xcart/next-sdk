@@ -39,14 +39,17 @@ $menu      = macro_get_named_argument('menu');
 // {{{ Check arguments
 
 // --module
-if (!$module) {
-    macro_error('--module is empty');
+if ($module) {
+    if (!preg_match('/^[a-z\d]+\\\\[a-z\d]+$/iSs', $module)) {
+        macro_error('--module has wrong module name');
+    }
 
-} elseif (!preg_match('/^[a-z\d]+\\\\[a-z\d]+$/iSs', $module)) {
-    macro_error('--module has wrong module name');
+    list($moduleAuthor, $moduleName) = explode('\\', $module, 2);
+
+} else {
+    $moduleAuthor = null;
+    $moduleName = null;
 }
-
-list($moduleAuthor, $moduleName) = explode('\\', $module, 2);
 
 // --target
 if (!$target) {
@@ -62,6 +65,7 @@ $targetClass = macro_assemble_class_name(
     $moduleAuthor,
     $moduleName
 );
+
 $targetControllerPath = macro_convert_class_name_to_path($targetClass);
 $targetControllerParent = 'admin' == $interface ? '\\XLite\\Controller\\Admin\\AAdmin' : '\\XLite\\Controller\\Customer\\ACustomer';
 $targetShort = macro_get_class_short_name($targetClass);
@@ -87,12 +91,20 @@ echo 'done' . PHP_EOL;
 
 // {{{ Page widget
 
-$pageClass = macro_assemble_class_name('View\\Page\\' . ('admin' == $interface ? 'Admin' : 'Customer') . '\\' . $targetShort, $moduleAuthor, $moduleName);
+$pageClass = macro_assemble_class_name(
+    'View\\Page\\' . ('admin' == $interface ? 'Admin' : 'Customer') . '\\' . $targetShort,
+    $moduleAuthor,
+    $moduleName
+);
 $pagePath = macro_convert_class_name_to_path($pageClass);
 
 echo 'Build page widget ' . $pagePath . ' ... ';
 
-$pageTemplate = macro_assemble_tpl_name('page/' . $target . '/body.tpl', $moduleAuthor, $moduleName);
+$pageTemplate = macro_assemble_tpl_name(
+    'page/' . $target . '/body.tpl',
+    $moduleAuthor,
+    $moduleName
+);
 
 $listTag = 'admin' == $interface ? 'list="admin.center", zone="admin"' : 'list="center"';
 
@@ -162,7 +174,7 @@ echo 'done' . PHP_EOL;
 
 // {{{ Menu item
 
-if ($menu) {
+if ($menu && $moduleAuthor) {
 
     $menuClass = macro_assemble_class_name(
         ('admin' == $interface ? 'View\\Menu\\Admin\\TopMenu' : 'View\\Menu\\Customer\\Top'),

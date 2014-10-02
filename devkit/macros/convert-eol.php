@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 // vim: set ts=4 sw=4 sts=4 et:
 
@@ -25,7 +26,7 @@ if (is_dir($path)) {
     $dirIterator = new \RecursiveDirectoryIterator($path . DIRECTORY_SEPARATOR);
     $iterator    = new \RecursiveIteratorIterator($dirIterator, \RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($iterator as $filePath => $fileObject) {
-        if (preg_match('/\.(php|tpl|css|js|yaml)$/Ss', $filePath)) {
+        if (preg_match('/\.(php|tpl|css|js|yaml|less)$/Ss', $filePath)) {
             $files[] = $filePath;
         }
     }
