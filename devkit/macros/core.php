@@ -53,6 +53,9 @@ if (!defined('MACRO_NO_XCN_CORE')) {
     }
 
     require_once XCN_MACROS_ROOT . DIRECTORY_SEPARATOR . 'top.inc.php';
+    if (file_exists(XCN_MACROS_ROOT . DIRECTORY_SEPARATOR . 'top.inc.additional.php')) {
+        require_once XCN_MACROS_ROOT . DIRECTORY_SEPARATOR . 'top.inc.additional.php';
+    }
 }
 
 array_shift($_SERVER['argv']);

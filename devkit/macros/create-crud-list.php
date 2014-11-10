@@ -343,7 +343,7 @@ echo 'done' . PHP_EOL;
 
 // {{{ List page widget
 
-$viewListPageClass = macro_assemble_class_name('View\\' . $targetShort, $moduleAuthor, $moduleName);
+$viewListPageClass = macro_assemble_class_name('View\\Page\\' . $targetShort, $moduleAuthor, $moduleName);
 $viewListPagePath = macro_convert_class_name_to_path($viewListPageClass);
 
 echo "\t" . 'page widget ' . $viewListPagePath . ' ... ';
@@ -941,8 +941,6 @@ if ($sortFields) {
      * array(<Field to order>, <Sort direction>)
      *
      * @return array
-     * @see    ____func_see____
-     * @since  1.0.6
      */
     protected function getOrderBy()
     {
@@ -1125,6 +1123,7 @@ CODE;
         $const = strtoupper($field);
         $string .= <<<CODE
             \\$entityRepoClass::SEARCH_$const => static::PARAM_SEARCH_$const,
+
 CODE;
 
     }
@@ -1152,6 +1151,7 @@ CODE;
         $const = strtoupper($field);
         $string .= <<<CODE
         \$this->requestParams[] = static::PARAM_SEARCH_$const;
+
 CODE;
     }
     $string .= <<<CODE
@@ -1336,6 +1336,8 @@ CODE;
                 ->setParameter('$field', \$value);
         }
     }
+
+
 CODE;
 }
 
@@ -1361,6 +1363,7 @@ CODE;
     {
         call_user_func_array(array(\$this, 'assignFrame'), array_merge(array(\$queryBuilder), \$value));
     }
+
 
 CODE;
 		}
@@ -1399,6 +1402,7 @@ CODE;
             }
         }
     }
+
 
 CODE;
 		}
@@ -1500,7 +1504,7 @@ $handlingSearchParams
 $prepareMethods
     // }}}
 
-	}
+}
 CODE;
 
 	macro_file_put_contents($entityRepoPath, $string);
@@ -1635,7 +1639,7 @@ echo 'done' . PHP_EOL;
 
 // {{{ One page widget
 
-$viewOnePageClass = macro_assemble_class_name('View\\' . $targetOneShort, $moduleAuthor, $moduleName);
+$viewOnePageClass = macro_assemble_class_name('View\\Page\\' . $targetOneShort, $moduleAuthor, $moduleName);
 $viewOnePagePath = macro_convert_class_name_to_path($viewOnePageClass);
 
 echo "\t" . 'page widget ' . $viewListPagePath . ' ... ';
