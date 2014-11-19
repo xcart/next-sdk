@@ -28,6 +28,9 @@
  */
 class RESTAPIClient extends \Guzzle\Http\Client
 {
+    
+    CONST DEFAULT_MODE = 'default';
+
     /**
      * Factory 
      *
@@ -36,13 +39,34 @@ class RESTAPIClient extends \Guzzle\Http\Client
      *  
      * @return \RESTAPIClient
      */
-    public static function factory($url, $key)
+    public static function factory($url, $key, $mode = 'default')
     {
         $client = new static($url);
         $client->setKey($key);
+        $client->setMode($mode);
 
         return $client;
     }
+
+    public function setMode($mode) 
+    {
+        if (!in_array($mode, $this->getAllowedModes())) {
+            $mode = static::DEFAULT_MODE;
+        }
+
+        $this->mode = $mode;
+    }
+
+    public function getMode() 
+    {
+        return $this->mode;
+    }
+
+    protected function getAllowedModes() 
+    {
+        return array ('default', 'complex');
+    }
+
 
     /**
      * Set key
@@ -185,7 +209,7 @@ class RESTAPIClient extends \Guzzle\Http\Client
      */
     protected function assembleAPIURI($uri)
     {
-        return $this->getBaseUrl() . '?target=RESTAPI&_key=' . $this->getKey() . '&_path=' . $uri;
+        return $this->getBaseUrl() . '?target=RESTAPI&_key=' . $this->getKey() . '&_schema=' . $this->getMode() . '&_path=' . $uri;
     }
 
     // }}}
