@@ -197,8 +197,9 @@ function generate_categories($parent = 0, $depth = 1)
                         'image_y' => 27,
                     ),
                 );
-                func_save_image($file_upload_data, 'C', $id);
-                $GLOBALS['sums']['categoryImages']++;
+                if (func_save_image($file_upload_data, 'C', $id)) {
+                    $GLOBALS['sums']['categoryImages']++;
+                }
             }
         }
 
@@ -287,7 +288,9 @@ function generate_products($id)
                     'image_y' => 27,
                 ),
             );
-            func_save_image($file_upload_data, $type, $pid);
+            if (func_save_image($file_upload_data, $type, $pid)) {
+                $GLOBALS['sums']['productImages']++;
+            }
        }
     }
 
