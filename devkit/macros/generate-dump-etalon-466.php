@@ -100,6 +100,20 @@ if ($GLOBALS['categories'] > 0) {
     print 'Generate categories ';
     generate_categories();
     print ' done' . PHP_EOL;
+
+
+    print 'Rebuild categories cache ';
+    func_cat_tree_rebuild_rec();
+    func_cat_tree_rebuild_category_level();
+    func_data_cache_clear('get_categories_tree');
+    func_data_cache_clear('get_offers_categoryid');
+
+    if (!empty($active_modules['Flyout_Menus']) && func_fc_use_cache()) {
+        func_fc_build_categories(1, false, false, false);
+    }
+
+    print ' done' . PHP_EOL;
+
 }
 
 // }}}
@@ -133,6 +147,16 @@ if ($GLOBALS['products'] > 0) {
             }
         }
     }
+
+    print 'Rebuild products cache ';
+
+    XCRangeProductIdsAdmin::dropCache();
+
+    if (!empty($active_modules['Flyout_Menus']) && func_fc_use_cache()) {
+        func_fc_build_categories(1, false, false, false);
+    }
+    print ' done' . PHP_EOL;
+
 }
 
 // }}}
@@ -166,16 +190,36 @@ die(0);
 
 function generate_categories($parent = 0, $depth = 1)
 {
+    global $sql_tbl, $active_modules;
+
     $list = array();
     for ($i = 0; $i < $GLOBALS['categories']; $i++) {
-        $id = @func_insert_category($parent, $i);
+        $id = @func_insert_category($parent, $i, 'Test category #' . $depth . ' - ' . $i);
         func_array2update(
-            'categories', 
+            'categories',
             array(
-                'category'   => 'Test category #' . $depth . ' - ' . $i,
+                'category' => 'Test category #' . $depth . ' - ' . $i,
             ),
-            "categoryid = '$id'"
+            'categoryid = ' . $id
         );
+        XCProducts_CategoriesChange::repairIntegrity($id);
+
+        $int_cat_data = array(
+            'categoryid'  => $id,
+            'code'        => 'en',
+            'category'    => 'Test category #' . $depth . ' - ' . $i,
+            'description' => '',
+        );
+        func_array2insert('categories_lng', $int_cat_data);
+
+        $path = func_get_category_path($id);
+
+        func_reflect_category_availability_changes($id);
+
+        if (!empty($path)) {
+            func_recalc_subcat_count($path);
+        }
+
 
         print '.';
         $GLOBALS['sums']['categories']++;
@@ -213,7 +257,7 @@ function generate_categories($parent = 0, $depth = 1)
 
 function generate_products($id)
 {
-    global $sql_tbl, $provider;
+    global $sql_tbl, $provider, $active_modules;
 
     $list = array();
     for ($i = 0; $i < $GLOBALS['products']; $i++) {
@@ -226,6 +270,7 @@ function generate_products($id)
                 'meta_description' => '',
                 'meta_keywords'    => '',
                 'title_tag'        => '',
+                'avail'            => 100,
             )
         );
         func_array2insert(
@@ -237,6 +282,8 @@ function generate_products($id)
             )
         );
 
+        XCProductSalesStats::insertNewRow($pid);
+
         func_array2insert(
             'products_lng_en',
             array(
@@ -245,8 +292,7 @@ function generate_products($id)
                 'descr'     => '',
                 'fulldescr' => '',
                 'keywords'  => ''
-            ),
-            true
+            )
         );
 
         func_array2insert(
@@ -257,6 +303,18 @@ function generate_products($id)
                 'main'       => 'Y'
             )
         );
+
+        XCProducts_CategoriesChange::repairIntegrity($id, $pid);
+
+        if (
+            !empty($active_modules['Recommended_Products'])
+            || !empty($active_modules['Add_to_cart_popup'])
+        ) {
+            func_refresh_product_rnd_keys($pid);
+        }
+
+        func_build_quick_flags($pid);
+        func_build_quick_prices($pid);
 
         $list[] = $pid;
 
