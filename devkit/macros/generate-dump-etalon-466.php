@@ -168,11 +168,14 @@ if ($GLOBALS['orders'] > 0) {
     print 'Clear orders ... ';
     $orders = func_query("SELECT orderid FROM $sql_tbl[orders]");
     @func_delete_order($orders);
+    db_query("DELETE FROM $sql_tbl[customers] WHERE usertype = 'C'");
     print 'done' . PHP_EOL;
 
     $orders = $_tmp;
     print 'Generate orders ';
     generate_orders();
+
+    \XCProductSalesStats::repairIntegrity(0);
     print ' done' . PHP_EOL;
 }
 
@@ -470,9 +473,23 @@ function generate_orders()
                     'password' => addslashes(text_crypt(text_hash('master'))),
                     'change_password'      => 'N',
                     'change_password_date' => XC_TIME,
-                    'email'    => 'bit-bucket+customer@x-cart.com',
+                    'email'       => 'bit-bucket+customer@x-cart.com',
+                    'last_login'  => XC_TIME,
+                    'first_login' => XC_TIME,
+                    'language'    => 'en',
+                    'is_anonymous_customer' => 0,
+                    'status'      => 'Y',
+                    'firstname'   => 'Tester',
+                    'lastname'    => 'Tester',
                 )
             );
+            func_call_event('user.register.aftersave', $userid);
+
+            $newuser_info = func_userinfo($userid, 'C', false, '', null, false);
+            global $xcart_dir;
+            require_once $xcart_dir . '/include/classes/class.XCSignature.php';
+            $obj_user = new XCUserSignature($newuser_info);
+            $obj_user->updateSignature();
         }
 
         $productCount = func_query_first_cell("SELECT COUNT(*) FROM $sql_tbl[products]");
@@ -481,9 +498,36 @@ function generate_orders()
             $oid = func_array2insert(
                 'orders',
                 array(
-                    'userid' => $userid,
-                    'giftcert_ids' => '',
-                    'taxes_applied' => '',
+                    'userid'         => $userid,
+                    'giftcert_ids'   => '',
+                    'taxes_applied'  => '',
+                    'date'           => XC_TIME,
+                    'shipping'       => 'Test shipping',
+                    'payment_method' => 'Test payment',
+                    'firstname'      => 'Tester',
+                    'lastname'       => 'Tester',
+                    'b_firstname'    => 'Tester',
+                    'b_lastname'     => 'Tester',
+                    'b_address'      => 'Test address',
+                    'b_city'         => 'New York',
+                    'b_country'      => 'US',
+                    'b_state'        => 'NY',
+                    'b_zipcode'      => '10001',
+                    'b_phone'        => '1-800-657-7957',
+                    's_firstname'    => 'Tester',
+                    's_lastname'     => 'Tester',
+                    's_address'      => 'Test address',
+                    's_city'         => 'New York',
+                    's_country'      => 'US',
+                    's_state'        => 'NY',
+                    's_zipcode'      => '10001',
+                    's_phone'        => '1-800-657-7957',
+                    'email'          => 'bit-bucket+customer@x-cart.com',
+                    'language'       => 'en',
+                    'paymentid'      => 4,
+                    'payment_method' => 'Phone Ordering',
+                    'shippingid'     => 1,
+                    'shipping'       => 'UPS Ground',
                 )
             );
 
@@ -506,9 +550,33 @@ function generate_orders()
                         'productcode' => 'SKU' . $pid,
                         'product'     => 'Test product ' . $pid,
                         'product_options' => '',
-                        'extra_data'  => '',
+                        'extra_data'  => serialize(array(
+                            'subtotal'        => $price * $amount,
+                            'weight'          => 1,
+                            'product_options' => false,
+                            'display'         => false,
+                            'taxes'           => false,
+                        )),
                     )
                 );
+                func_array2insert(
+                    'order_details_stats',
+                    array(
+                        'productid'  => $pid,
+                        'orderid'    => $oid,
+                        'userid'     => $userid,
+                        'sum_amount' => $price * $amount,
+                        'date'       => XC_TIME,
+                    )
+                );
+                $tmp = func_query_first_cell("SELECT productid FROM $sql_tbl[product_sales_stats] WHERE productid = '$pid'");
+                if (!$tmp) {
+                    func_array2insert(
+                        'product_sales_stats',
+                        array('productid' => $pid, 'sales_stats' => 0)
+                    );
+                }
+                db_query("UPDATE $sql_tbl[product_sales_stats] SET sales_stats = (sales_stats + '$amount') WHERE productid = '$pid'");
                 $GLOBALS['sums']['orderItems']++;
             }
 
