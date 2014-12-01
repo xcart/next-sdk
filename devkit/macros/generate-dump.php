@@ -47,6 +47,11 @@ $wholesalePrices = max(0, intval(macro_get_named_argument('wholesalePrices')));
 $attributes = max(0, intval(macro_get_named_argument('attributes')));
 $options = max(0, intval(macro_get_named_argument('options')));
 $optionsValues = max(2, intval(macro_get_named_argument('optionsValues')));
+$variants = max(0, intval(macro_get_named_argument('variants')));
+$variantPrice = !is_null(macro_get_named_argument('variantPrice'));
+$variantAmount = !is_null(macro_get_named_argument('variantAmount'));
+$variantWeight = !is_null(macro_get_named_argument('variantWeight'));
+$variantSKU = !is_null(macro_get_named_argument('variantSKU'));
 $productImages = max(0, intval(macro_get_named_argument('productImages')));
 $orders = max(0, intval(macro_get_named_argument('orders')));
 $orderItems = max(1, intval(macro_get_named_argument('orderItems')));
@@ -61,6 +66,7 @@ $sums = array(
     'attributes'       => 0,
     'options'          => 0,
     'optionValues'     => 0,
+    'variants'         => 0,
     'productImages'    => 0,
     'wholesalePrices'  => 0,
     'orders'           => 0,
@@ -368,6 +374,7 @@ function generate_products(\XLite\Model\Category $category)
     // Options
     if ($GLOBALS['options'] > 0) {
         foreach ($list as $product) {
+            $options = array();
             for ($i = 0; $i < $GLOBALS['options']; $i++) {
                 $attribute = \XLite\Core\Database::getRepo('XLite\Model\Attribute')->insert(
                     array(
@@ -377,6 +384,12 @@ function generate_products(\XLite\Model\Category $category)
                     false
                 );
                 \XLite\Core\Database::getEM()->persist($attribute);
+                $options[$i] = array(
+                    'attribute' => $attribute,
+                    'values'    => array(),
+                    'count'     => 0,
+                    'i'         => 0,
+                );
                 for ($n = 0; $n < $GLOBALS['optionsValues']; $n++) {
                     $option = \XLite\Core\Database::getRepo('XLite\Model\AttributeOption')->insert(
                         array(
@@ -396,10 +409,58 @@ function generate_products(\XLite\Model\Category $category)
                         false
                     );
                     \XLite\Core\Database::getEM()->persist($value);
+                    $options[$i]['values'][] = $value;
+                    $options[$i]['count']++;
                     $GLOBALS['sums']['optionValues']++;
                 }
 
                 $GLOBALS['sums']['options']++;
+            }
+
+            if (
+                $GLOBALS['variants'] > 0
+                && \XLite\Core\Operator::isClassExists('XLite\Module\XC\ProductVariants\Model\ProductVariant')
+            ) {
+                $optiosn[0]['i'] = -1;
+                for ($i = 0; $i < $GLOBALS['variants']; $i++) {
+                    $variant = \XLite\Core\Database::getRepo('XLite\Module\XC\ProductVariants\Model\ProductVariant')->insert(
+                        array(
+                            'product'       => $product,
+                            'defaultPrice'  => !$GLOBALS['variantPrice'],
+                            'price'         => $GLOBALS['variantPrice'] ? rand(1, 100) : 0,
+                            'defaultAmount' => !$GLOBALS['variantAmount'],
+                            'amount'        => $GLOBALS['variantAmount'] ? rand(1, 100) : 0,
+                            'defaultWeight' => !$GLOBALS['variantWeight'],
+                            'weight'        => $GLOBALS['variantWeight'] ? rand(1, 100) : 0,
+                            'SKU'           => $GLOBALS['variantSKU'] ? $product->getSKU() . 'v' . $i : '',
+                        ),
+                        false
+                    );
+                    \XLite\Core\Database::getEM()->persist($variant);
+                    $GLOBALS['sums']['variants']++;
+
+                    $product->addVariants($variant);
+    
+                    $added = false;
+                    foreach ($options as $idx => $option) {
+                        //$option['attribute']->addVariantsProducts($product);
+                        if (!$product->getVariantsAttributes()->contains($option['attribute'])) {
+                            $product->addVariantsAttributes($option['attribute']);
+                        }
+                        if (!$added) {
+                            $options[$idx]['i']++;
+                            if ($options[$idx]['i'] >= $options[$idx]['count']) {
+                                $options[$idx]['i'] = 0;
+                            } else {
+                                $added = true;
+                            }
+                        }
+                    }
+
+                    foreach ($options as $idx => $option) {
+                        $variant->addAttributeValueS($option['values'][$option['i']]);
+                    }
+                }
             }
         }
     }
@@ -569,7 +630,7 @@ function macro_help()
     $script = __FILE__;
 
     return <<<HELP
-Usage: $script --categories=<categories count per level> --categoryImage --depth=<categories depth> --featuredProducts=<featured products per category> --products=<product per category> --attributes=<attributes per product> --options=<options per product> --optionsValues=<option values per option> --productImages=<images per product> --wholesalePrices=<wholesale prices per product> --orders=<order count> --orderItems=<order items per product>
+Usage: $script --categories=<categories count per level> --categoryImage --depth=<categories depth> --featuredProducts=<featured products per category> --products=<product per category> --attributes=<attributes per product> --options=<options per product> --optionsValues=<option values per option> --productImages=<images per product> --wholesalePrices=<wholesale prices per product> --variants=<product variants per product> --variantPrice --variantAmount --variantWeight --variantSKU --orders=<order count> --orderItems=<order items per product>
 
     --categories=<categories count per level>
         Categories per ceategories tree level. Default - 0
@@ -595,6 +656,21 @@ Usage: $script --categories=<categories count per level> --categoryImage --depth
     --optionsValues=<option values per option>
         Option values per option. Default - 2
 
+    --variants=<variants per product>
+        Product variants per product. Default - 0
+
+    --variantPrice
+        Product variants has own price. Default - use default product price
+
+    --variantAmount
+        Product variants has own stock amount. Default - use default product stock
+
+    --variantWeight
+        Product variants has own weight. Default - use default product weight
+
+    --variantSKU
+        Product variants has own SKU. Default - use default product SKU
+
     --productImages=<images per product>
         Product'images per product. Default - 0
 
@@ -607,7 +683,7 @@ Usage: $script --categories=<categories count per level> --categoryImage --depth
     --orderItems=<order items per product>
         Order items per order. Default - 1
 
-Example: $script --categories=5 --categoryImage --depth=3 --featuredProducts=20 --products=100 --attributes=20 --options=3 --optionsValues=10 --productImages=3 --wholesalePrices=5 --orders=20000 --orderItems=5
+Example: $script --categories=5 --categoryImage --depth=3 --featuredProducts=20 --products=100 --attributes=20 --options=3 --optionsValues=10 --productImages=3 --wholesalePrices=5 --variants=5 --variantPrice --variantAmount --variantWeight --variantSKU --orders=20000 --orderItems=5
 HELP;
 }
 
