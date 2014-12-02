@@ -26,7 +26,7 @@
 /**
  * REST API client 
  */
-class RESTAPIClient extends \Guzzle\Http\Client
+class RESTAPIClient extends \GuzzleHttp\Client
 {
     
     CONST DEFAULT_MODE = 'default';
@@ -41,7 +41,7 @@ class RESTAPIClient extends \Guzzle\Http\Client
      */
     public static function factory($url, $key, $mode = 'default')
     {
-        $client = new static($url);
+        $client = new static(array('base_url' => $url));
         $client->setKey($key);
         $client->setMode($mode);
 
@@ -92,109 +92,47 @@ class RESTAPIClient extends \Guzzle\Http\Client
 
     // {{{ Interfaces
 
-    /**
-     * Create a GET request for the client
-     *
-     * @param string|array                              $uri     Resource URI
-     * @param array|Collection                          $headers HTTP headers
-     * @param string|resource|array|EntityBodyInterface $body    Where to store the response entity body
-     *
-     * @return RequestInterface
-     * @see    \Guzzle\Http\ClientInterface::createRequest()
-     */
-    public function get($uri = null, $headers = null, $body = null)
+    public function get($uri = null, $options = array())
     {
-        return parent::get($this->assembleAPIURI($uri), $headers, $body);
+        return parent::get($this->assembleAPIURI($uri), $options);
     }
 
-    /**
-     * Create a HEAD request for the client
-     *
-     * @param string|array     $uri     Resource URI
-     * @param array|Collection $headers HTTP headers
-     *
-     * @return RequestInterface
-     * @see    Guzzle\Http\ClientInterface::createRequest()
-     */
-    public function head($uri = null, $headers = null, array $options = array())
+    public function head($uri = null, array $options = array())
     {
         throw new \Exception('HEAD request not supported');
     }
 
-    /**
-     * Create a DELETE request for the client
-     *
-     * @param string|array     $uri     Resource URI
-     * @param array|Collection $headers HTTP headers
-     * @param string|resource|EntityBodyInterface $body    Body to send in the request
-     *
-     * @return EntityEnclosingRequestInterface
-     * @see    Guzzle\Http\ClientInterface::createRequest()
-     */
-    public function delete($uri = null, $headers = null, $body = null, array $options = array())
+    public function delete($uri = null, array $options = array())
     {
-        return parent::delete($this->assembleAPIURI($uri), $headers, $body, $options);
+        return parent::delete($this->assembleAPIURI($uri), $options);
     }
 
-    /**
-     * Create a PUT request for the client
-     *
-     * @param string|array                        $uri     Resource URI
-     * @param array|Collection                    $headers HTTP headers
-     * @param string|resource|EntityBodyInterface $body    Body to send in the request
-     *
-     * @return EntityEnclosingRequestInterface
-     * @see    Guzzle\Http\ClientInterface::createRequest()
-     */
-    public function put($uri = null, $headers = null, $body = null, array $options = array())
+    public function put($uri = null, array $options = array())
     {
-        if (is_array($body)) {
-            $body = http_build_query(array('model' => $body));
+        if (isset($options['body']) && is_array($options['body'])) {
+            $options['body'] = http_build_query(array('model' => $options['body']));
         }
 
-        return parent::put($this->assembleAPIURI($uri), $headers, $body, $options);
+        return parent::put($this->assembleAPIURI($uri), $options);
     }
 
-    /**
-     * Create a PATCH request for the client
-     *
-     * @param string|array                        $uri     Resource URI
-     * @param array|Collection                    $headers HTTP headers
-     * @param string|resource|EntityBodyInterface $body    Body to send in the request
-     *
-     * @return EntityEnclosingRequestInterface
-     * @see    Guzzle\Http\ClientInterface::createRequest()
-     */
-    public function patch($uri = null, $headers = null, $body = null, array $options = array())
+    public function patch($uri = null, array $options = array())
     {
         throw new \Exception('PATCH request not supported');
     }
 
-    /**
-     * Create a POST request for the client
-     *
-     * @param string|array                                $uri      Resource URI
-     * @param array|Collection                            $headers  HTTP headers
-     * @param array|Collection|string|EntityBodyInterface $postBody POST body. Can be a string, EntityBody, or
-     *                                                    associative array of POST fields to send in the body of the
-     *                                                    request.  Prefix a value in the array with the @ symbol to
-     *                                                    reference a file.
-     * @return EntityEnclosingRequestInterface
-     * @see    Guzzle\Http\ClientInterface::createRequest()
-     */
-    public function post($uri = null, $headers = null, $postBody = null, array $options = array())
+    public function post($uri = null, array $options = array())
     {
-        return parent::post($this->assembleAPIURI($uri), $headers, $postBody, $options);
+        $request = $this->createRequest('POST', $this->assembleAPIURI($uri));
+
+        if (isset($options['body']) && is_array($options['body'])) {
+            $postBody = $request->getBody();
+            $postBody->setField('model', json_encode($options['body']));
+        }
+
+        return $this->send($request);
     }
 
-    /**
-     * Create an OPTIONS request for the client
-     *
-     * @param string|array $uri Resource URI
-     *
-     * @return RequestInterface
-     * @see    Guzzle\Http\ClientInterface::createRequest()
-     */
     public function options($uri = null, array $options = array())
     {
         throw new \Exception('OPTIONS request not supported');
@@ -215,4 +153,3 @@ class RESTAPIClient extends \Guzzle\Http\Client
     // }}}
 
 }
-
