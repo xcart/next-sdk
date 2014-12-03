@@ -73,6 +73,11 @@ $sums = array(
     'orderItems'       => 0,
 );
 
+$random = array(
+    'categoryId' => 0,
+    'productId'  => 0,
+);
+
 $t = microtime(true);
 
 // {{{ Categories
@@ -174,11 +179,14 @@ if ($GLOBALS['orders'] > 0) {
 
 // }}}
 
+print 'Random: ' . json_encode($random) . PHP_EOL . PHP_EOL;
+
 print 'Statistics:' . PHP_EOL;
 foreach ($sums as $k => $v) {
     print "\t" . $k . ': ' . $v . PHP_EOL;
 }
 print 'Duration: ' . gmdate('H:i:s', $t - microtime(true)) . PHP_EOL;
+
 
 die(0);
 
@@ -311,6 +319,9 @@ function generate_products(\XLite\Model\Category $category)
         foreach ($list as $product) {
             $q1 = 1;
             $q2 = 10;
+            if ($product->getPrtoductId() % 4 != 3) {
+                continue;
+            }
             for ($i = 0; $i < $GLOBALS['wholesalePrices']; $i++) {
                 $last = $i == $GLOBALS['wholesalePrices'] - 1;
                 \XLite\Core\Database::getRepo('XLite\Module\CDev\Wholesale\Model\WholesalePrice')->insert(
@@ -420,8 +431,9 @@ function generate_products(\XLite\Model\Category $category)
             if (
                 $GLOBALS['variants'] > 0
                 && \XLite\Core\Operator::isClassExists('XLite\Module\XC\ProductVariants\Model\ProductVariant')
+                && $product->getProductId() % 2 == 0
             ) {
-                $optiosn[0]['i'] = -1;
+                $options[0]['i'] = -1;
                 for ($i = 0; $i < $GLOBALS['variants']; $i++) {
                     $variant = \XLite\Core\Database::getRepo('XLite\Module\XC\ProductVariants\Model\ProductVariant')->insert(
                         array(
@@ -464,6 +476,9 @@ function generate_products(\XLite\Model\Category $category)
             }
         }
     }
+
+    $GLOBALS['random']['categoryId'] = $category->getCategoryId();
+    $GLOBALS['random']['productId'] = $list[rand(0, count($list) - 1)]->getProductId();
 
     \XLite\Core\Database::getEM()->flush();
     \XLite\Core\Database::getEM()->clear();

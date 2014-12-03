@@ -35,26 +35,18 @@ define('PRODUCT_IMAGE_PATH', LC_DIR_ROOT . 'public/error_image.png');
 
 // {{{ Normalize input
 
-$categories = max(0, intval(macro_get_named_argument('categories')));
-$categoryImage = !is_null(macro_get_named_argument('categoryImage'));
-$depth = max(1, intval(macro_get_named_argument('depth')));
-$products = max(0, intval(macro_get_named_argument('products')));
-$featuredProducts = min(
-    $products,
-    max(0, intval(macro_get_named_argument('featuredProducts')))
-);
-$wholesalePrices = max(0, intval(macro_get_named_argument('wholesalePrices')));
-$attributes = max(0, intval(macro_get_named_argument('attributes')));
-$options = max(0, intval(macro_get_named_argument('options')));
-$optionsValues = max(2, intval(macro_get_named_argument('optionsValues')));
-$variants = max(0, intval(macro_get_named_argument('variants')));
-$variantPrice = !is_null(macro_get_named_argument('variantPrice'));
-$variantAmount = !is_null(macro_get_named_argument('variantAmount'));
-$variantWeight = !is_null(macro_get_named_argument('variantWeight'));
-$variantSKU = !is_null(macro_get_named_argument('variantSKU'));
-$productImages = max(0, intval(macro_get_named_argument('productImages')));
-$orders = max(0, intval(macro_get_named_argument('orders')));
-$orderItems = max(1, intval(macro_get_named_argument('orderItems')));
+$categories = 10;
+$categoryImage = true;
+$depth = 2;
+$products = 20;
+$featuredProducts = 20;
+$wholesalePrices = 0;
+$attributes = 0;
+$options = 0;
+$optionsValues = 0;
+$productImages = 1;
+$orders = 1000;
+$orderItems = 0;
 
 // }}}
 
@@ -66,12 +58,19 @@ $sums = array(
     'attributes'       => 0,
     'options'          => 0,
     'optionValues'     => 0,
-    'variants'         => 0,
     'productImages'    => 0,
     'wholesalePrices'  => 0,
     'orders'           => 0,
     'orderItems'       => 0,
 );
+$counters = array(
+    'attributes'      => 0,
+    'options'         => 0,
+    'wholesalePrices' => 0,
+    'productImages'   => 0,
+    'orders'          => 0,
+);
+
 
 $t = microtime(true);
 
@@ -117,7 +116,9 @@ if ($GLOBALS['products'] > 0) {
         ->getResult();
     foreach ($categories as $category) {
         $category = \XLite\Core\Database::getRepo('XLite\Model\Category')->find($category->getCategoryId());
-        generate_products($category);
+        if (0 == count($category->getChildren())) {
+            generate_products($category);
+        }
     }
     print ' done' . PHP_EOL;
 
@@ -268,17 +269,17 @@ function generate_products(\XLite\Model\Category $category)
     \XLite\Core\Database::getEM()->flush();
 
     // Images
-    if ($GLOBALS['productImages'] > 0) {
-        foreach ($list as $product) {
-            for ($i = 0; $i < $GLOBALS['productImages']; $i++) {
-                $image = new \XLite\Model\Image\Product\Image;
-                $image->setProduct($product);
-                if ($image->loadFromLocalFile(PRODUCT_IMAGE_PATH)) {
-                    $product->addImages($image);
-                    $GLOBALS['sums']['productImages']++;
-                }
-           }
-        }
+    foreach ($list as $product) {
+        $GLOBALS['counters']['productImages']++;
+        $limit = floor($GLOBALS['counters']['productImages'] / 100) + 1;
+        for ($i = 0; $i < $limit; $i++) {
+            $image = new \XLite\Model\Image\Product\Image;
+            $image->setProduct($product);
+            if ($image->loadFromLocalFile(PRODUCT_IMAGE_PATH)) {
+                $product->addImages($image);
+                $GLOBALS['sums']['productImages']++;
+            }
+       }
     }
 
     // Featured products
@@ -304,15 +305,14 @@ function generate_products(\XLite\Model\Category $category)
     }
 
     // Wholesale prices
-    if (
-        $GLOBALS['wholesalePrices'] > 0
-        && \XLite\Core\Operator::isClassExists('XLite\Module\CDev\Wholesale\Model\WholesalePrice')
-    ) {
+    if (\XLite\Core\Operator::isClassExists('XLite\Module\CDev\Wholesale\Model\WholesalePrice')) {
         foreach ($list as $product) {
             $q1 = 1;
             $q2 = 10;
-            for ($i = 0; $i < $GLOBALS['wholesalePrices']; $i++) {
-                $last = $i == $GLOBALS['wholesalePrices'] - 1;
+            $GLOBALS['counters']['wholesalePrices']++;
+            $limit = floor($GLOBALS['counters']['wholesalePrices'] / 100) + 2;
+            for ($i = 0; $i < $limit; $i++) {
+                $last = $i == $limit - 1;
                 \XLite\Core\Database::getRepo('XLite\Module\CDev\Wholesale\Model\WholesalePrice')->insert(
                     array(
                         'quantityRangeBegin' => $q1,
@@ -336,22 +336,60 @@ function generate_products(\XLite\Model\Category $category)
             );
         }
     }
+
     // Attributes
-    if ($GLOBALS['attributes'] > 0) {
-        foreach ($list as $product) {
-            for ($i = 0; $i < $GLOBALS['attributes']; $i++) {
-                $attribute = \XLite\Core\Database::getRepo('XLite\Model\Attribute')->insert(
-                    array(
-                        'product' => $product,
-                        'name'    => 'Test attribute ' . $product->getProductId() . '-' . $i,
-                    ),
-                    false
-                );
-                \XLite\Core\Database::getEM()->persist($attribute);
+    foreach ($list as $product) {
+        $GLOBALS['counters']['attributes']++;
+        $limit = floor($GLOBALS['counters']['attributes'] / 100);
+        for ($i = 0; $i < $limit; $i++) {
+            $attribute = \XLite\Core\Database::getRepo('XLite\Model\Attribute')->insert(
+                array(
+                    'product' => $product,
+                    'name'    => 'Test attribute ' . $product->getProductId() . '-' . $i,
+                ),
+                false
+            );
+            \XLite\Core\Database::getEM()->persist($attribute);
+            $option = \XLite\Core\Database::getRepo('XLite\Model\AttributeOption')->insert(
+                array(
+                    'attribute' => $attribute,
+                    'name'      => 'value ' . $i,
+                ),
+                false
+            );
+            \XLite\Core\Database::getEM()->persist($option);
+            $value = \XLite\Core\Database::getRepo('XLite\Model\AttributeValue\AttributeValueSelect')->insert(
+                array(
+                    'attribute'        => $attribute,
+                    'product'          => $product,
+                    'attribute_option' => $option,
+                ),
+                false
+            );
+            \XLite\Core\Database::getEM()->persist($value);
+
+            $GLOBALS['sums']['attributes']++;
+        }
+    }
+
+    // Options
+    foreach ($list as $product) {
+        $GLOBALS['counters']['options']++;
+        $limit = floor($GLOBALS['counters']['options'] / 100);
+        for ($i = 0; $i < $limit; $i++) {
+            $attribute = \XLite\Core\Database::getRepo('XLite\Model\Attribute')->insert(
+                array(
+                    'product' => $product,
+                    'name'    => 'Test option ' . $product->getProductId() . '-' . $i,
+                ),
+                false
+            );
+            \XLite\Core\Database::getEM()->persist($attribute);
+            for ($n = 0; $n < $limit + 1; $n++) {
                 $option = \XLite\Core\Database::getRepo('XLite\Model\AttributeOption')->insert(
                     array(
                         'attribute' => $attribute,
-                        'name'      => 'value ' . $i,
+                        'name'      => 'value ' . $i . '-' . $n,
                     ),
                     false
                 );
@@ -361,107 +399,15 @@ function generate_products(\XLite\Model\Category $category)
                         'attribute'        => $attribute,
                         'product'          => $product,
                         'attribute_option' => $option,
+                        'priceModifier'    => $n > 0 ? round(rand(0, 50) / 10, 1) : 0,
                     ),
                     false
                 );
                 \XLite\Core\Database::getEM()->persist($value);
-
-                $GLOBALS['sums']['attributes']++;
-            }
-        }
-    }
-
-    // Options
-    if ($GLOBALS['options'] > 0) {
-        foreach ($list as $product) {
-            $options = array();
-            for ($i = 0; $i < $GLOBALS['options']; $i++) {
-                $attribute = \XLite\Core\Database::getRepo('XLite\Model\Attribute')->insert(
-                    array(
-                        'product' => $product,
-                        'name'    => 'Test option ' . $product->getProductId() . '-' . $i,
-                    ),
-                    false
-                );
-                \XLite\Core\Database::getEM()->persist($attribute);
-                $options[$i] = array(
-                    'attribute' => $attribute,
-                    'values'    => array(),
-                    'count'     => 0,
-                    'i'         => 0,
-                );
-                for ($n = 0; $n < $GLOBALS['optionsValues']; $n++) {
-                    $option = \XLite\Core\Database::getRepo('XLite\Model\AttributeOption')->insert(
-                        array(
-                            'attribute' => $attribute,
-                            'name'      => 'value ' . $i . '-' . $n,
-                        ),
-                        false
-                    );
-                    \XLite\Core\Database::getEM()->persist($option);
-                    $value = \XLite\Core\Database::getRepo('XLite\Model\AttributeValue\AttributeValueSelect')->insert(
-                        array(
-                            'attribute'        => $attribute,
-                            'product'          => $product,
-                            'attribute_option' => $option,
-                            'priceModifier'    => $n > 0 ? round(rand(0, 50) / 10, 1) : 0,
-                        ),
-                        false
-                    );
-                    \XLite\Core\Database::getEM()->persist($value);
-                    $options[$i]['values'][] = $value;
-                    $options[$i]['count']++;
-                    $GLOBALS['sums']['optionValues']++;
-                }
-
-                $GLOBALS['sums']['options']++;
+                $GLOBALS['sums']['optionValues']++;
             }
 
-            if (
-                $GLOBALS['variants'] > 0
-                && \XLite\Core\Operator::isClassExists('XLite\Module\XC\ProductVariants\Model\ProductVariant')
-            ) {
-                $optiosn[0]['i'] = -1;
-                for ($i = 0; $i < $GLOBALS['variants']; $i++) {
-                    $variant = \XLite\Core\Database::getRepo('XLite\Module\XC\ProductVariants\Model\ProductVariant')->insert(
-                        array(
-                            'product'       => $product,
-                            'defaultPrice'  => !$GLOBALS['variantPrice'],
-                            'price'         => $GLOBALS['variantPrice'] ? rand(1, 100) : 0,
-                            'defaultAmount' => !$GLOBALS['variantAmount'],
-                            'amount'        => $GLOBALS['variantAmount'] ? rand(1, 100) : 0,
-                            'defaultWeight' => !$GLOBALS['variantWeight'],
-                            'weight'        => $GLOBALS['variantWeight'] ? rand(1, 100) : 0,
-                            'SKU'           => $GLOBALS['variantSKU'] ? $product->getSKU() . 'v' . $i : '',
-                        ),
-                        false
-                    );
-                    \XLite\Core\Database::getEM()->persist($variant);
-                    $GLOBALS['sums']['variants']++;
-
-                    $product->addVariants($variant);
-    
-                    $added = false;
-                    foreach ($options as $idx => $option) {
-                        //$option['attribute']->addVariantsProducts($product);
-                        if (!$product->getVariantsAttributes()->contains($option['attribute'])) {
-                            $product->addVariantsAttributes($option['attribute']);
-                        }
-                        if (!$added) {
-                            $options[$idx]['i']++;
-                            if ($options[$idx]['i'] >= $options[$idx]['count']) {
-                                $options[$idx]['i'] = 0;
-                            } else {
-                                $added = true;
-                            }
-                        }
-                    }
-
-                    foreach ($options as $idx => $option) {
-                        $variant->addAttributeValueS($option['values'][$option['i']]);
-                    }
-                }
-            }
+            $GLOBALS['sums']['options']++;
         }
     }
 
@@ -494,7 +440,9 @@ function generate_orders()
                 false
             );
             $profileClone->setOrder($order);
-            for ($n = 0; $n < $GLOBALS['orderItems']; $n++) {
+            $GLOBALS['counters']['orders']++;
+            $limit = floor($GLOBALS['counters']['orders'] / 100) + 1;
+            for ($n = 0; $n < $limit; $n++) {
                 $product = \XLite\Core\Database::getRepo('XLite\Model\Product')->findFrame(
                     rand(0, $productCount - 1),
                     1
@@ -630,7 +578,7 @@ function macro_help()
     $script = __FILE__;
 
     return <<<HELP
-Usage: $script --categories=<categories count per level> --categoryImage --depth=<categories depth> --featuredProducts=<featured products per category> --products=<product per category> --attributes=<attributes per product> --options=<options per product> --optionsValues=<option values per option> --productImages=<images per product> --wholesalePrices=<wholesale prices per product> --variants=<product variants per product> --variantPrice --variantAmount --variantWeight --variantSKU --orders=<order count> --orderItems=<order items per product>
+Usage: $script --categories=<categories count per level> --categoryImage --depth=<categories depth> --featuredProducts=<featured products per category> --products=<product per category> --attributes=<attributes per product> --options=<options per product> --optionsValues=<option values per option> --productImages=<images per product> --wholesalePrices=<wholesale prices per product> --orders=<order count> --orderItems=<order items per product>
 
     --categories=<categories count per level>
         Categories per ceategories tree level. Default - 0
@@ -656,21 +604,6 @@ Usage: $script --categories=<categories count per level> --categoryImage --depth
     --optionsValues=<option values per option>
         Option values per option. Default - 2
 
-    --variants=<variants per product>
-        Product variants per product. Default - 0
-
-    --variantPrice
-        Product variants has own price. Default - use default product price
-
-    --variantAmount
-        Product variants has own stock amount. Default - use default product stock
-
-    --variantWeight
-        Product variants has own weight. Default - use default product weight
-
-    --variantSKU
-        Product variants has own SKU. Default - use default product SKU
-
     --productImages=<images per product>
         Product'images per product. Default - 0
 
@@ -683,7 +616,7 @@ Usage: $script --categories=<categories count per level> --categoryImage --depth
     --orderItems=<order items per product>
         Order items per order. Default - 1
 
-Example: $script --categories=5 --categoryImage --depth=3 --featuredProducts=20 --products=100 --attributes=20 --options=3 --optionsValues=10 --productImages=3 --wholesalePrices=5 --variants=5 --variantPrice --variantAmount --variantWeight --variantSKU --orders=20000 --orderItems=5
+Example: $script --categories=5 --categoryImage --depth=3 --featuredProducts=20 --products=100 --attributes=20 --options=3 --optionsValues=10 --productImages=3 --wholesalePrices=5 --orders=20000 --orderItems=5
 HELP;
 }
 
