@@ -55,9 +55,9 @@ die(0);
 
 /**
  * Print output row
- * 
+ *
  * @param array $data Row
- *  
+ *
  * @return void
  */
 function xcne_print_output($data)
@@ -73,10 +73,10 @@ function xcne_print_output($data)
 }
 
 /**
- * Convert charset 
- * 
+ * Convert charset
+ *
  * @param string $string String
- *  
+ *
  * @return string
  */
 function xcne_convert_charset($string)
@@ -99,25 +99,41 @@ function xcne_convert_charset($string)
 
 /**
  * Get headers list
- * 
+ *
  * @return array
  */
 function xcne_get_headers()
 {
     return array(
-        'sku',          'name_en',      'description_en',   'briefDescription_en', 'metaTags_en',
-        'metaDesc_en',  'metaTitle_en', 'price',            'enabled',             'weight',
-        'freeShipping', 'cleanURL',     'arrivalDate',      'openGraphMeta',       'useCustomOpenGraphMeta',
-        'categories',   'images',       'inventoryEnabled', 'lowLimitEnabled',     'lowLimitLevel',
-        'stockLevel',   'productClass',
+        'sku',
+        'name_en',
+        'description_en',
+        'briefDescription_en',
+        'metaTags_en',
+        'metaDesc_en',
+        'metaTitle_en',
+        'price',
+        'enabled',
+        'weight',
+        'freeShipping',
+        'cleanURL',
+        'arrivalDate',
+        'openGraphMeta',
+        'useCustomOpenGraphMeta',
+        'categories',
+        'images',
+        'stockLevel',
+        'lowLimitEnabled',
+        'lowLimitLevel',
+        'productClass',
     );
 }
 
 /**
- * Format cell 
- * 
+ * Format cell
+ *
  * @param string $value Cell value
- *  
+ *
  * @return string
  */
 function xcne_format_cell($value)
@@ -134,10 +150,10 @@ function xcne_format_cell($value)
 }
 
 /**
- * Assemble CSV row 
- * 
+ * Assemble CSV row
+ *
  * @param resource $stm MySQL resource
- *  
+ *
  * @return array
  */
 function xcne_assemble_csv_row($stm)
@@ -165,7 +181,7 @@ function xcne_assemble_csv_row($stm)
         if (isset($sql_tbl['clean_urls'])) {
             $tmp = func_query_first('SELECT clean_url FROM ' . $sql_tbl['clean_urls'] . ' WHERE resource_type = "P" AND resource_id = ' . $data['productid']);
             if ($tmp) {
-                $data['clean_url'] = $tmp['clean_url'];
+                $data['clean_url'] = str_replace('.', '' ,$tmp['clean_url']);
             }
         }
 
@@ -236,8 +252,9 @@ function xcne_assemble_csv_row($stm)
             'N',                                       // useCustomOG
             $data['categories'],                       // categories
             $data['images'],                           // images
+            $data['avail'],                            // stockLevel
+            $data['low_avail_limit'] > 0 ? 'Y' : 'N',  // lowLimitEnabled
             $data['low_avail_limit'],                  // lowLimitAmount
-            $data['avail'],                            // amount
             '',                                        // classes
         );
     }
@@ -246,10 +263,10 @@ function xcne_assemble_csv_row($stm)
 }
 
 /**
- * Get category path 
- * 
+ * Get category path
+ *
  * @param integer $cid Category id
- *  
+ *
  * @return string
  */
 function xcne_get_category_path($cid)
@@ -289,7 +306,7 @@ function xcne_get_category_path($cid)
 
 /**
  * Get products query as resource
- * 
+ *
  * @return resource
  */
 function xcne_get_products_query()
@@ -304,8 +321,8 @@ function xcne_get_products_query()
 // {{{ Service
 
 /**
- * Get X-Cart version 
- * 
+ * Get X-Cart version
+ *
  * @return float
  */
 function xcne_version()
@@ -324,9 +341,9 @@ function xcne_version()
 
 /**
  * Error reporter
- * 
+ *
  * @param string $message Message
- *  
+ *
  * @return void
  */
 function xcne_error($message)
@@ -336,9 +353,9 @@ function xcne_error($message)
 
 /**
  * Load X-Cart subsystem
- * 
+ *
  * @param string $subsystem Subsystem code
- *  
+ *
  * @return void
  */
 function xcne_load($subsystem)
@@ -351,4 +368,3 @@ function xcne_load($subsystem)
 // }}}
 
 // }}}
-
