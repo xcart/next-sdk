@@ -232,7 +232,7 @@ function xcne_assemble_csv_row($stm)
                 $data['images'][] = str_replace(';', '&#59;', $current_location . '/image.php?productid=' . $data['productid']);
             }
         }
-        $data['images'] = implode(' && ', $data['images']);
+        $data['images'] = implode('&&', $data['images']);
 
         $row = array(
             $data['productcode'], // sku
