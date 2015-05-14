@@ -206,7 +206,7 @@ function xcne_assemble_csv_row($stm)
         foreach ($tmp as $c) {
             $data['categories'][] = xcne_get_category_path($c['categoryid']);
         }
-        $data['categories'] = implode(' && ', $data['categories']);
+        $data['categories'] = implode('&&', $data['categories']);
 
         // Images
         $data['images'] = array();
