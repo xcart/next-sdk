@@ -237,8 +237,8 @@ function xcne_assemble_csv_row($stm)
         $row = array(
             $data['productcode'], // sku
             $data['product'],     // name
-            $data['descr'],       // description
-            $data['fulldescr'],   // briefDescription
+            $data['fulldescr'],   // description
+            $data['descr'],       // briefDescription
             isset($data['meta_keywords']) ? $data['meta_keywords'] : '',       // metaTags
             isset($data['meta_description']) ? $data['meta_description'] : '', // metaDesc
             '',                                        // metaTitle
