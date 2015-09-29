@@ -812,7 +812,8 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
         $var = $this->commentParser->getVar()->getContent();
 
          // Check type
-         $r = $this->checkType($var, $this->allowedParamTypes, 'var');
+         $allowedParamTypes = array_merge($this->allowedParamTypes, $this->getClassAliases($this->currentFile, $errorPos));
+         $r = $this->checkType($var, $allowedParamTypes, 'var');
          if (true !== $r) {
 	         $this->currentFile->addError($this->getReqPrefix('REQ.PHP.3.5.15') . $r, $errorPos);
          }
@@ -840,7 +841,8 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 
         // Check type
 		if ($this->commentParser->getReturn()) {
-            $r = $this->checkType($this->commentParser->getReturn()->getValue(), $this->allowedReturnTypes, 'return');
+            $allowedReturnTypes = array_merge($this->allowedReturnTypes, $this->getClassAliases($this->currentFile, $commentStart));
+            $r = $this->checkType($this->commentParser->getReturn()->getValue(), $allowedReturnTypes, 'return');
             if (true !== $r) {
                 $this->currentFile->addError($this->getReqPrefix('REQ.PHP.3.5.15') . $r, $commentStart + $this->commentParser->getReturn()->getLine());
             }
@@ -913,7 +915,8 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
                 $errorPos     = ($param->getLine() + $commentStart);
 
 				// Check type
-				$r = $this->checkType($param->getType(), $this->allowedParamTypes, 'param');
+                $allowedParamTypes = array_merge($this->allowedParamTypes, $this->getClassAliases($this->currentFile, $commentStart));
+				$r = $this->checkType($param->getType(), $allowedParamTypes, 'param');
 				if (true !== $r) {
 	            	$this->currentFile->addError($this->getReqPrefix('REQ.PHP.3.5.15') . $r, $errorPos);
 				}
@@ -1143,4 +1146,40 @@ abstract class XLite_TagsSniff extends XLite_ReqCodesSniff
 			? $tagInfo['internal'][$name]
 			: $tagInfo[$name];
 	}
+
+    /**
+     * Get array of uset class aliases in current namespace
+     *
+     * @param  PHP_CodeSniffer_File $phpcsFile File
+     * @param  integer              $position  Start position
+     *
+     * @return array
+     */
+    protected function getClassAliases($phpcsFile, $position)
+    {
+        $startPosition = $phpcsFile->findPrevious(T_NAMESPACE, $position + 1);
+        $endPosition = $phpcsFile->findPrevious(T_CLASS, $position + 1);
+
+        $result = array();
+
+        $tokens = $phpcsFile->getTokens();
+
+        while ($startPosition < $endPosition) {
+            $startPosition = $phpcsFile->findNext(T_AS, $startPosition + 1);
+
+            if (!$startPosition || $startPosition > $endPosition) {
+                break;
+            }
+
+            $startPosition = $phpcsFile->findNext(T_STRING, $startPosition + 1);
+
+            if (!$startPosition || $startPosition > $endPosition) {
+                break;
+            }
+
+            $result[] = $tokens[$startPosition]['content'];
+        }
+
+        return $result;
+    }
 }
